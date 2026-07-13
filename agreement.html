@@ -442,7 +442,7 @@ _subject:'SIGNED Wholesale Agreement \u2014 '+pv('v-bn'),
 'DBA':pv('v-dba'),
 'Business Type':pv('v-bt'),
 'Account Rep':pv('v-rep'),
-'Email':pv('v-em'),
+'Email':validEmail(pv('v-em')),
 'Phone':pv('v-ph'),
 'Invoice Email':pv('v-inv'),
 'Billing Address':pv('v-ba'),
@@ -463,13 +463,30 @@ _subject:'SIGNED Wholesale Agreement \u2014 '+pv('v-bn'),
 'Drawn Signature (PNG data \u2014 paste into browser address bar to view)':canvas.toDataURL('image/png')
 })})
 .then(function(r){
-if(r.ok){showExecuted();}
-else{throw new Error();}
-})
-.catch(function(){
-btn.disabled=false;btn.textContent='Sign & Submit Agreement';
-alert('Could not submit \u2014 please check your connection and try again.');
+if(r.ok){showExecuted();return;}
+return r.json().catch(function(){return null;}).then(function(j){
+var m='';
+if(j&&j.errors&&j.errors.length){m=j.errors.map(function(e){return e.field+' '+e.message;}).join('; ');}
+throw new Error(m||('server responded '+r.status));
 });
+})
+.catch(function(err){
+btn.disabled=false;btn.textContent='Sign & Submit Agreement';
+showSubmitError(err&&err.message?err.message:'unknown error');
+});
+}
+function validEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v||'').trim())?String(v).trim():undefined;}
+function showSubmitError(msg){
+var box=document.getElementById('submitErr');
+if(!box){
+box=document.createElement('div');
+box.id='submitErr';
+box.style.cssText='margin:14px auto 0;max-width:640px;padding:12px 14px;border:1px solid #b42318;border-left:4px solid #b42318;background:#fef3f2;color:#7a271a;font-size:14px;line-height:1.45;text-align:left;';
+var acts=document.querySelector('.sig-actions');
+acts.parentNode.insertBefore(box,acts.nextSibling);
+}
+box.innerHTML='<strong>Your agreement was NOT submitted.</strong><br>Nothing was sent and nothing was saved. Please email a copy to <a href="mailto:sales@bauersbrew.com">sales@bauersbrew.com</a> or call us \u2014 do not assume this went through.<br><span style="opacity:.7;font-size:12px;">Technical detail: '+String(msg).replace(/</g,'&lt;')+'</span>';
+box.scrollIntoView({behavior:'smooth',block:'center'});
 }
 function showExecuted(){
 document.querySelector('.sig-actions').style.display='none';
