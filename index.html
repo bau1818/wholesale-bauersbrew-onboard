@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bauer's Brew — Wholesale Account Application</title>
+<link href="https://fonts.googleapis.com/css2?family=Besley:wght@400;600;700;900&family=Noto+Serif:ital,wght@0,400;0,600;0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html{-webkit-text-size-adjust:100%;}
+:root{
+--gold:#E8B63B;--gdk:#C99D28;--black:#000;--white:#fff;
+--off:#F9F7F2;--border:#DDD8CC;--text:#111;--muted:#7A7060;
+--fd:'Clarendon','Besley',Georgia,serif;--fb:'Noto Serif',Georgia,serif;--fm:'Space Mono',monospace;
+}
+body{background:var(--off);color:var(--text);font-family:var(--fb);font-size:16px;line-height:1.6;padding:24px 16px 80px;}
+/* Card */
+.card{max-width:820px;margin:0 auto;background:var(--white);border:1px solid var(--border);}
+/* Masthead */
+.head{background:var(--black);padding:24px 28px 16px;border-bottom:3px solid var(--gold);text-align:center;}
+.head img{display:block;margin:0 auto 11px;width:124px;}
+.head-title{font-family:var(--fd);font-weight:900;font-size:clamp(13.5px,3vw,17px);letter-spacing:.08em;text-transform:uppercase;color:var(--gold);line-height:1.35;margin-bottom:11px;}
+.head-rule{border:none;border-top:1px solid rgba(232,182,59,.2);margin-bottom:9px;}
+.head-contact{font-size:10.5px;
+font-family:var(--fm);letter-spacing:.09em;text-transform:uppercase;
+color:rgba(255,255,255,.9);white-space:nowrap;
+display:flex;justify-content:center;align-items:center;gap:0;flex-wrap:nowrap;
+}
+.head-contact span{white-space:nowrap;}
+.hsep{margin:0 10px;color:rgba(232,182,59,.5);}
+/* Intro */
+.intro{background:var(--gold);padding:11px 28px;font-family:var(--fm);font-size:11.5px;letter-spacing:.04em;color:var(--black);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+/* Sections */
+.sec{padding:20px 28px;border-bottom:1px solid var(--border);}
+.sec-head{display:flex;align-items:center;margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid var(--gold);}
+.sec-title{font-family:var(--fd);font-weight:900;font-size:17px;letter-spacing:.05em;text-transform:uppercase;color:var(--black);white-space:nowrap;}
+/* Grid */
+.g{margin:0 -8px;font-size:0;}
+.f{display:inline-block;vertical-align:top;box-sizing:border-box;padding:7px 8px;font-size:16px;}
+.f>*{display:block;}
+.f .lbl{margin-bottom:5px;}
+.f .hint{margin:-3px 0 5px;}
+.c12{width:100%;}.c8{width:66.66%;}.c7{width:58.33%;}
+.c6{width:50%;}.c5{width:41.66%;}.c4{width:33.33%;}.c3{width:25%;}
+@media(max-width:560px){.c8,.c7,.c6,.c5,.c4,.c3{width:100%;}}
+/* Labels */
+.lbl{font-family:var(--fm);font-weight:700;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);white-space:nowrap;}
+.req{color:var(--gdk);}
+.hint{font-weight:400;font-size:9.5px;text-transform:none;letter-spacing:0;color:var(--muted);display:block;margin-top:1px;line-height:1.4;}
+/* Fields */
+input[type=text],input[type=email],input[type=tel],input[type=url],input[type=date],textarea,select{
+font-family:var(--fb);font-size:16px;color:var(--text);
+background:var(--off);border:1px solid var(--border);
+padding:11px 13px;width:100%;
+transition:border-color .12s,box-shadow .12s;
+border-radius:0;-webkit-appearance:none;appearance:none;
+}
+textarea{resize:vertical;min-height:52px;line-height:1.5;}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,182,59,.18);background:var(--white);}
+input::placeholder,textarea::placeholder{color:#C0B9AB;}
+select{cursor:pointer;}
+/* Intention checkboxes */
+.intent-grid{border:1px solid var(--border);margin-top:5px;}
+.irow{display:flex;align-items:center;gap:11px;padding:11px 13px;background:var(--off);border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;}
+.irow:last-child{border-bottom:none;}
+.irow:hover{background:#f0ede5;}
+.irow input[type=checkbox]{width:16px;height:16px;flex:none;accent-color:var(--black);-webkit-appearance:auto;appearance:auto;cursor:pointer;}
+.irow-label{font-family:var(--fd);font-weight:900;font-size:13px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;}
+.irow-other-input{flex:1;min-width:0;}
+.irow-other-input input{font-size:13px;padding:5px 9px;background:var(--white);}
+/* ST-120 notice */
+.st120-notice{margin-top:12px;border:1px solid var(--border);background:var(--off);padding:12px 14px;display:flex;flex-direction:column;gap:5px;}
+.st120-link{font-family:var(--fm);font-weight:700;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--gdk);text-decoration:none;display:inline-flex;align-items:center;gap:5px;}
+.st120-link::before{content:"↗";font-size:12px;}
+.st120-link:hover{text-decoration:underline;}
+.st120-req{font-family:var(--fm);font-size:9.5px;color:var(--muted);line-height:1.45;letter-spacing:.03em;}
+/* Payment table */
+.pay-table{width:100%;border-collapse:collapse;border:1px solid var(--border);margin-bottom:14px;}
+.pay-table th{background:var(--black);color:var(--gold);font-family:var(--fm);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;padding:10px 16px;text-align:left;white-space:nowrap;}
+.pay-table td{padding:11px 16px;font-family:var(--fd);font-weight:700;font-size:13px;white-space:nowrap;border-bottom:1px solid var(--border);}
+.pay-table tbody tr:last-child td{border-bottom:none;}
+.pay-table td:last-child{color:var(--gdk);}
+.pay-table th,.pay-table td{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+/* Payment option cards */
+.pay-opts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+@media(max-width:520px){.pay-opts{grid-template-columns:repeat(2,1fr);}}
+.popt{border:1px solid var(--border);padding:11px 10px;background:var(--off);overflow:hidden;}
+.popt-name{font-family:var(--fm);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--black);display:flex;align-items:center;gap:5px;margin-bottom:3px;white-space:nowrap;}
+.pbadge{background:var(--gold);color:var(--black);font-size:7px;letter-spacing:.1em;padding:2px 4px;font-weight:700;white-space:nowrap;flex:none;}
+.popt p{font-family:var(--fm);font-size:8.5px;color:var(--muted);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.popt input{font-size:12px;padding:5px 7px;margin-top:4px;}
+/* T&C */
+.tc-head{background:var(--black);padding:12px 28px;}
+.tc-head h2{font-family:var(--fd);font-weight:900;font-size:14px;letter-spacing:.07em;text-transform:uppercase;color:var(--gold);white-space:nowrap;}
+.tc-body{padding:15px 28px;columns:2;column-gap:26px;}
+@media(max-width:540px){.tc-body{columns:1;}}
+.cl{break-inside:avoid;margin-bottom:10px;}
+.cl h3{font-family:var(--fd);font-weight:700;font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--black);margin-bottom:2px;white-space:nowrap;}
+.cln{color:var(--gdk);}
+.cl p{font-size:10px;line-height:1.6;color:#444;}
+.cl.disc p{font-weight:700;font-size:9.5px;text-transform:uppercase;background:var(--off);border-left:3px solid var(--gold);padding:6px 8px;color:var(--black);line-height:1.5;}
+/* Signature */
+.sec-sign{padding:20px 28px 24px;border-bottom:none;}
+.ack{display:flex;align-items:flex-start;gap:11px;background:var(--off);border:1px solid var(--border);padding:12px;margin-bottom:14px;}
+.ack input[type=checkbox]{width:17px;height:17px;flex:none;margin-top:2px;accent-color:var(--gold);-webkit-appearance:auto;appearance:auto;background:none;border:none;padding:0;box-shadow:none;}
+.ack input[type=checkbox]:focus{box-shadow:none;}
+.ack-text{font-size:12px;line-height:1.6;color:var(--text);}
+.sign-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:16px 22px;margin-bottom:24px;}
+@media(max-width:520px){.sign-grid{grid-template-columns:1fr;}}
+/* Canvas signature pad */
+.sig-wrap{display:flex;flex-direction:column;gap:4px;}
+.sig-canvas-box{position:relative;border:1px solid var(--border);border-bottom:2px solid var(--black);background:var(--off);cursor:crosshair;}
+#sigCanvas{display:block;width:100%;height:80px;touch-action:none;}
+.sig-clear{position:absolute;top:5px;right:6px;font-family:var(--fm);font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;background:transparent;border:1px solid var(--border);color:var(--muted);padding:3px 8px;cursor:pointer;transition:border-color .12s,color .12s;}
+.sig-clear:hover{border-color:var(--black);color:var(--black);}
+.sig-placeholder{position:absolute;bottom:8px;left:10px;font-family:var(--fm);font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:rgba(0,0,0,.2);pointer-events:none;}
+.cap{font-family:var(--fm);font-size:9px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);}
+/* Action block */
+.sig-actions{border-top:2px solid var(--gold);padding-top:18px;display:flex;flex-direction:column;align-items:center;gap:9px;}
+.btn-submit{font-family:var(--fd);font-weight:900;font-size:15px;letter-spacing:.06em;text-transform:uppercase;background:var(--gold);color:var(--black);border:none;cursor:pointer;padding:14px 40px;width:100%;max-width:340px;transition:background .15s;white-space:nowrap;}
+.btn-submit:hover{background:var(--gdk);}
+.btn-submit:focus-visible{outline:2px solid var(--black);outline-offset:2px;}
+.btn-print{font-family:var(--fm);font-weight:700;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;background:transparent;color:var(--text);border:1px solid var(--border);cursor:pointer;padding:9px 20px;white-space:nowrap;transition:border-color .12s;}
+.btn-print:hover{border-color:var(--black);}
+.sig-fine{font-family:var(--fm);font-size:9.5px;letter-spacing:.04em;color:var(--muted);text-align:center;line-height:1.5;}
+.sig-fine a{color:var(--muted);}
+/* Office use */
+.office{margin:0 28px 18px;border:1px dashed var(--border);padding:13px 15px;background:var(--off);}
+.off-head{font-family:var(--fm);font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:11px;}
+.off-approved{display:flex;align-items:center;gap:9px;margin-bottom:11px;}
+.off-approved input[type=checkbox]{width:18px;height:18px;accent-color:var(--black);-webkit-appearance:auto;appearance:auto;flex:none;}
+.off-approved label{font-family:var(--fd);font-weight:900;font-size:13px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;}
+.off-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;}
+@media(max-width:460px){.off-grid{grid-template-columns:1fr;}}
+.off-sigline{border-bottom:1.5px solid var(--black);height:34px;margin-top:3px;}
+.off-sigcap{font-family:var(--fm);font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:3px;}
+/* Footer */
+.foot{background:var(--black);padding:10px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;}
+.foot span{font-family:var(--fm);font-size:9px;letter-spacing:.07em;text-transform:uppercase;color:rgba(255,255,255,.85);white-space:nowrap;}
+.foot .st-note{color:var(--gold);font-weight:700;}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;}}
+@media print{
+@page{size:Letter;margin:.45in;}
+body{background:#fff;padding:0;font-size:10.5px;}
+.card{max-width:none;border:none;}
+.head,.tc-head,.foot{background:#000;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.intro{background:var(--gold);-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.pay-table th{background:#000;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.sec,.sec-sign{padding:16px 0;}
+.tc-body{columns:2;}
+.cl{break-inside:avoid;}
+.sig-actions,.btn-submit,.btn-print,.sig-fine{display:none;}
+.office,.foot{break-inside:avoid;}
+.pay-opts{grid-template-columns:repeat(4,1fr);}
+#sigCanvas{border:1px solid #ccc;}
+}
+.agree-row{display:flex;align-items:flex-start;gap:10px;background:var(--off);border:1px solid var(--border);padding:12px;margin-bottom:16px;}
+.agree-row input[type=checkbox]{margin-top:2px;flex:none;width:15px;height:15px;accent-color:var(--gold);}
+.agree-text{font-size:13.5px;line-height:1.55;color:#000;}
+/* Request info block */
+.reqinfo{background:var(--black);border-bottom:1px solid var(--border);padding:16px 28px;}
+.reqinfo-label{font-family:var(--fm);font-weight:700;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.reqinfo-row{display:flex;gap:8px;}
+.reqinfo-row input{flex:1;min-width:0;background:#fff;border:1px solid var(--border);padding:10px 12px;font-family:var(--fb);font-size:13px;}
+.btn-req{flex:none;background:var(--gold);color:var(--black);border:none;font-family:var(--fm);font-weight:700;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding:10px 16px;cursor:pointer;white-space:nowrap;}
+.btn-req:hover{background:var(--gdk);}
+.reqinfo-fine{font-family:var(--fm);font-size:8.5px;color:rgba(255,255,255,.55);margin-top:6px;letter-spacing:.03em;}
+</style>
+</head>
+<body>
+<form class="card" id="wsForm" novalidate>
+<header class="head">
+<img src="https://cdn.shopify.com/s/files/1/0382/7790/6567/files/BAUERS_BREW_2024_Logo_Refresh_Wordmark-Specialty-Coffee_Gold_a023466a-16a8-4686-9bd3-96fa1cf5d4a9.png?v=1720527846&width=280" alt="Bauer's Brew Specialty Coffee">
+<div class="head-title">Wholesale Account<br>Application</div>
+<hr class="head-rule">
+<div class="head-contact">
+<span>SALES@BAUERSBREW.COM</span>
+<span class="hsep">|</span>
+<span>HUNTINGTON, NY 11746</span>
+</div>
+</header>
+<div class="intro">Complete all required fields (*).</div>
+<div class="reqinfo">
+<span class="reqinfo-label">Request Wholesale Product &amp; Pricing Info</span>
+<div class="reqinfo-row">
+<input type="email" id="reqemail" placeholder="your@email.com" autocomplete="email">
+<button class="btn-req" type="button" onclick="reqInfo()">Request Info</button>
+</div>
+<p class="reqinfo-fine">We&rsquo;ll personally send our current Wholesale Catalog to your inbox.</p>
+</div>
+<div class="sec">
+<div class="sec-head"><h2 class="sec-title">Business Information</h2></div>
+<div class="g">
+<div class="f c8">
+<label class="lbl" for="bizname">Legal Business Name <span class="req">*</span></label>
+<input type="text" id="bizname" name="bizname" required placeholder="e.g. Bauer's Brew Co. LLC">
+</div>
+<div class="f c4">
+<label class="lbl" for="dba">DBA / Trade Name</label>
+<input type="text" id="dba" name="dba" placeholder="If different">
+</div>
+<div class="f c5">
+<label class="lbl" for="biztype">Business Type <span class="req">*</span></label>
+<select id="biztype" name="biztype" required onchange="toggleBizOther(this)">
+<option value="">Select&hellip;</option>
+<option>Caf&eacute; / Coffee Shop</option>
+<option>Restaurant</option>
+<option>Bakery</option>
+<option>Grocery / Specialty Market</option>
+<option>Bar / Hotel</option>
+<option>Office / Workplace</option>
+<option>Online Retailer</option>
+<option>Distributor</option>
+<option>Other</option>
+</select>
+<div id="biztype-other-wrap" style="display:none;margin-top:6px;">
+<input type="text" id="biztype-other" name="biztype-other" placeholder="Please specify&hellip;">
+</div>
+</div>
+<div class="f c7">
+<label class="lbl" for="owner">Your Name / Account Rep <span class="req">*</span></label>
+<input type="text" id="owner" name="owner" required placeholder="First and last name">
+</div>
+<div class="f c6">
+<label class="lbl" for="email">Email <span class="req">*</span></label>
+<input type="email" id="email" name="email" required>
+</div>
+<div class="f c6">
+<label class="lbl" for="phone">Phone <span class="req">*</span></label>
+<input type="tel" id="phone" name="phone" required placeholder="(631) 555-0123">
+</div>
+<div class="f c6">
+<label class="lbl" for="invoiceemail">Invoice Email</label>
+<span class="hint">If different from above</span>
+<input type="email" id="invoiceemail" name="invoiceemail" placeholder="billing@yourbusiness.com">
+</div>
+<div class="f c6">
+<label class="lbl" for="website">Website</label>
+<input type="url" id="website" name="website" placeholder="www.yourbusiness.com">
+</div>
+<div class="f c6">
+<label class="lbl" for="addr">Billing Address <span class="req">*</span></label>
+<textarea id="addr" name="addr" required placeholder="Street, City, State, ZIP"></textarea>
+</div>
+<div class="f c6">
+<label class="lbl" for="delivery">Delivery Address &amp; Hours
+<span class="hint">If different — include available days/times</span>
+</label>
+<textarea id="delivery" name="delivery" placeholder="Address + hours, e.g. Mon&ndash;Fri 7am&ndash;2pm"></textarea>
+</div>
+<div class="f c6">
+<label class="lbl" for="social">Social Handle(s)</label>
+<input type="text" id="social" name="social" placeholder="@yourbusiness">
+</div>
+<div class="f c6">
+<label class="lbl" for="heard">How Did You Hear About Us?</label>
+<select id="heard" name="heard">
+<option value="">Select&hellip;</option>
+<option>Referral / Word of Mouth</option>
+<option>Farmers Market</option>
+<option>Instagram / Social Media</option>
+<option>Google / Search</option>
+<option>Tried the coffee somewhere</option>
+<option>Other</option>
+</select>
+</div>
+</div>
+</div>
+<div class="sec">
+<div class="sec-head"><h2 class="sec-title">Wholesale Account Intention</h2></div>
+<div class="g">
+<div class="f c12">
+<label class="lbl">Select all that apply <span class="req">*</span></label>
+<div class="intent-grid">
+<label class="irow">
+<input type="checkbox" name="intent" value="RESALE">
+<span class="irow-label">Resale</span>
+</label>
+<label class="irow">
+<input type="checkbox" name="intent" value="SERVICE">
+<span class="irow-label">Service</span>
+</label>
+<div class="irow" style="cursor:default;">
+<input type="checkbox" id="intent-other-cb" name="intent" value="OTHER">
+<span class="irow-label">Other</span>
+<div class="irow-other-input" id="intent-other-wrap">
+<input type="text" id="intent-other-txt" name="intent-other" placeholder="Please describe&hellip;" onfocus="document.getElementById('intent-other-cb').checked=true">
+</div>
+</div>
+</div>
+</div>
+<div class="f c12">
+<label class="lbl">Products of Interest &mdash; Check All That Apply</label>
+<div class="intent-grid">
+<label class="irow"><input type="checkbox" name="products" value="RTD Cold Brew Bottles"><span class="irow-label" style="text-transform:none;">RTD Cold Brew Bottles</span></label>
+<label class="irow"><input type="checkbox" name="products" value="Roasted Coffee Bags"><span class="irow-label" style="text-transform:none;">Roasted Coffee Bags</span></label>
+<label class="irow"><input type="checkbox" name="products" value="Cold'Spresso"><span class="irow-label" style="text-transform:none;">Cold&rsquo;Spresso</span></label>
+<label class="irow"><input type="checkbox" name="products" value="Kegs / Bag-in-Box"><span class="irow-label" style="text-transform:none;">Kegs / Bag-in-Box</span></label>
+<label class="irow"><input type="checkbox" name="products" value="Service Use"><span class="irow-label" style="text-transform:none;">Service Use</span></label>
+</div>
+<p class="st120-req" style="margin-top:6px;">Pricing, order minimums, and full product details are available in our Wholesale Catalog.</p>
+</div>
+<div class="f c12">
+<div class="st120-notice">
+<a class="st120-link" href="https://www.tax.ny.gov/pdf/current_forms/st/st120_fill_in.pdf" target="_blank" rel="noopener">
+NYS ST-120 Sales Tax Exemption Form
+</a>
+<p class="st120-req">Resellers must submit this form before the account can be approved. Email completed form to sales@bauersbrew.com.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sec-sign">
+<div class="sec-head"><h2 class="sec-title">Submit</h2></div>
+<div class="agree-row">
+<input type="checkbox" id="consent" name="consent" required>
+<label for="consent" class="agree-text">
+I confirm the information above is accurate and agree to be contacted by Bauer's Brew Co. LLC by email, phone, or text about this application. Submitting this form does not open an account &mdash; approved applicants receive the official Wholesale Agreement for signature. <span class="req">*</span>
+</label>
+</div>
+<div class="sig-actions">
+<button class="btn-submit" type="button" onclick="wsSubmit()">Submit Application</button>
+<p class="sig-fine">Questions? Email <a href="mailto:sales@bauersbrew.com">sales@bauersbrew.com</a></p>
+</div>
+</div>
+<footer class="foot">
+<span>Bauer's Brew Co. LLC &middot; 2026</span>
+<span class="st-note">Resellers: attach ST-120 Resale Certificate</span>
+</footer>
+</form>
+<script>
+/* ── Auto-date ── */
+(function(){
+var d=new Date(),el=document.getElementById('signdate');
+if(el) el.value=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+})();
+/* ── Business type Other ── */
+function toggleBizOther(sel){
+var wrap=document.getElementById('biztype-other-wrap');
+var inp=document.getElementById('biztype-other');
+var show=sel.value==='Other';
+wrap.style.display=show?'block':'none';
+inp.required=show;
+if(show) inp.focus();
+}
+/* ── Intent Other ── */
+/* ── Form utilities ── */
+function fv(id){var e=document.getElementById(id);return e?e.value.trim():'';}
+function reqInfo(){
+var em=document.getElementById('reqemail').value.trim();
+if(!em||em.indexOf('@')<1||em.indexOf('.')<3){
+document.getElementById('reqemail').focus();
+alert('Please enter a valid email address.');return;
+}
+var btn=document.querySelector('.btn-req');
+btn.disabled=true;btn.textContent='Sending\u2026';
+fetch('https://formspree.io/f/mjgqndpl',{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify({_subject:'Catalog Request \u2014 Wholesale','Request Type':'Wholesale Catalog Request','Email':em})})
+.then(function(r){
+if(r.ok){
+var fine=document.querySelector('.reqinfo-fine');
+fine.textContent='\u2713 Request sent \u2014 your catalog is on its way.';
+fine.style.color='#E8B63B';
+btn.textContent='Sent';
+}else{throw new Error();}
+})
+.catch(function(){
+btn.disabled=false;btn.textContent='Request Info';
+alert('Could not send \u2014 please check your connection and try again.');
+});
+}
+function buildLink(){
+var intents=[...document.querySelectorAll('input[name="intent"]:checked')].map(function(e){return e.value;}).join(', ')||'—';
+var prods=[...document.querySelectorAll('input[name="products"]:checked')].map(function(e){return e.value;}).join(', ')||'—';
+var q=function(id){return encodeURIComponent(fv(id));};
+return 'bn='+q('bizname')+'&dba='+q('dba')+'&bt='+encodeURIComponent(fv('biztype')+(fv('biztype-other')?' — '+fv('biztype-other'):''))
++'&rep='+q('owner')+'&em='+q('email')+'&ph='+q('phone')+'&inv='+q('invoiceemail')
++'&ba='+encodeURIComponent(fv('addr').replace(/\n/g,', '))
++'&da='+encodeURIComponent(fv('delivery').replace(/\n/g,', '))
++'&web='+q('website')+'&soc='+q('social')
++'&prod='+encodeURIComponent(prods)+'&int='+encodeURIComponent(intents+(fv('intent-other-txt')?' (other: '+fv('intent-other-txt')+')':''));
+}
+function wsSubmit(){
+var intentChecked=[...document.querySelectorAll('input[name="intent"]:checked')].length>0;
+if(!intentChecked){
+document.querySelector('.intent-grid').scrollIntoView({behavior:'smooth',block:'center'});
+alert('Please select at least one account intention.');return;
+}
+if(!document.getElementById('consent').checked){
+document.getElementById('consent').scrollIntoView({behavior:'smooth',block:'center'});
+alert('Please check the confirmation box before submitting.');return;
+}
+var form=document.getElementById('wsForm');
+if(!form.checkValidity()){
+var first=form.querySelector(':invalid');
+if(first){first.scrollIntoView({behavior:'smooth',block:'center'});first.focus();}
+alert('Please complete all required fields (*) before submitting.');return;
+}
+var intents=[...document.querySelectorAll('input[name="intent"]:checked')].map(function(e){return e.value;}).join(', ')||'\u2014';
+var prods=[...document.querySelectorAll('input[name="products"]:checked')].map(function(e){return e.value;}).join(', ')||'\u2014';
+var magic='https://wholesale.bauersbrew.com/approve.html?'+buildLink();
+var btn=document.querySelector('.btn-submit');
+btn.disabled=true;btn.textContent='Submitting\u2026';
+fetch('https://formspree.io/f/mjgqndpl',{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify({
+_subject:'Wholesale Application \u2014 '+fv('bizname'),
+'Legal Business Name':fv('bizname'),
+'DBA':fv('dba')||'(none)',
+'Business Type':fv('biztype')+(fv('biztype-other')?' \u2014 '+fv('biztype-other'):''),
+'Account Rep':fv('owner'),
+'Email':fv('email'),
+'Phone':fv('phone'),
+'Invoice Email':fv('invoiceemail')||'(same)',
+'Billing Address':fv('addr').replace(/\n/g,', '),
+'Delivery Address & Hours':fv('delivery').replace(/\n/g,', ')||'(same)',
+'Website':fv('website')||'(none)',
+'Social':fv('social')||'(none)',
+'How They Heard':fv('heard')||'(not stated)',
+'Account Intention':intents+(fv('intent-other-txt')?' (other: '+fv('intent-other-txt')+')':''),
+'Products of Interest':prods,
+'REVIEW & APPROVE \u2014 open this link to review the application and send the agreement':magic
+})})
+.then(function(r){
+if(r.ok){window.location.href='thanks.html';}
+else{throw new Error();}
+})
+.catch(function(){
+btn.disabled=false;btn.textContent='Submit Application';
+alert('Could not submit \u2014 please check your connection and try again.');
+});
+}
+</script>
+</body>
+</html>

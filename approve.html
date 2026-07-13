@@ -1,0 +1,88 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Review &amp; Approve — Bauer's Brew Wholesale</title>
+<link href="https://fonts.googleapis.com/css2?family=Besley:wght@400;700;900&family=Noto+Serif:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#E8B63B;--gdk:#C99D28;--black:#111;--off:#F9F7F2;--border:#DDD8CC;--muted:#7A7060;
+--fd:'Besley',Georgia,serif;--fb:'Noto Serif',Georgia,serif;--fm:'Space Mono',monospace;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#EAE6DC;font-family:var(--fb);color:var(--black);padding:24px 12px 60px;}
+.card{max-width:680px;margin:0 auto;background:#fff;border:1px solid var(--border);}
+.head{background:var(--black);text-align:center;padding:26px 24px 20px;border-bottom:3px solid var(--gold);}
+.head img{width:110px;display:block;margin:0 auto 10px;}
+.head h1{font-family:var(--fd);font-weight:900;color:var(--gold);font-size:17px;letter-spacing:.07em;text-transform:uppercase;line-height:1.35;}
+.strip{background:var(--gold);padding:10px 24px;font-family:var(--fm);font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;}
+.bd{padding:24px;}
+.sec-title{font-family:var(--fm);font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gdk);margin-bottom:10px;}
+.rows{border:1px solid var(--border);margin-bottom:24px;}
+.row{display:flex;gap:14px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--off);}
+.row:nth-child(even){background:#fff;}
+.row:last-child{border-bottom:none;}
+.row .k{flex:none;width:170px;font-family:var(--fm);font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-top:2px;}
+.row .v{font-size:13.5px;line-height:1.5;word-break:break-word;}
+.actions{border-top:2px solid var(--gold);padding-top:20px;display:flex;flex-direction:column;align-items:center;gap:10px;}
+.btn-approve{font-family:var(--fd);font-weight:900;font-size:14.5px;letter-spacing:.05em;text-transform:uppercase;background:var(--gold);color:var(--black);border:none;cursor:pointer;padding:14px 34px;width:100%;max-width:420px;transition:background .15s;}
+.btn-approve:hover{background:var(--gdk);}
+.btn-copy{font-family:var(--fm);font-weight:700;font-size:10px;letter-spacing:.1em;text-transform:uppercase;background:transparent;color:var(--black);border:1px solid var(--border);cursor:pointer;padding:9px 18px;transition:border-color .12s;}
+.btn-copy:hover{border-color:var(--black);}
+.fine{font-family:var(--fm);font-size:9px;letter-spacing:.04em;color:var(--muted);text-align:center;line-height:1.6;max-width:420px;}
+.foot{background:var(--black);padding:9px 24px;text-align:center;}
+.foot span{font-family:var(--fm);font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.85);}
+</style></head><body>
+<div class="card">
+<header class="head">
+<img src="https://cdn.shopify.com/s/files/1/0382/7790/6567/files/BAUERS_BREW_2024_Logo_Refresh_Wordmark-Specialty-Coffee_Gold_a023466a-16a8-4686-9bd3-96fa1cf5d4a9.png?v=1720527846&width=280" alt="Bauer's Brew Specialty Coffee">
+<h1>Internal Review &amp; Approval</h1>
+</header>
+<div class="strip">Application for <span id="stripBiz">&mdash;</span></div>
+<div class="bd">
+<div class="sec-title">Application Summary</div>
+<div class="rows">
+<div class="row"><span class="k">Legal Business Name</span><span class="v" id="s-bn">&mdash;</span></div>
+<div class="row"><span class="k">DBA / Trade Name</span><span class="v" id="s-dba">&mdash;</span></div>
+<div class="row"><span class="k">Business Type</span><span class="v" id="s-bt">&mdash;</span></div>
+<div class="row"><span class="k">Account Rep</span><span class="v" id="s-rep">&mdash;</span></div>
+<div class="row"><span class="k">Email</span><span class="v" id="s-em">&mdash;</span></div>
+<div class="row"><span class="k">Phone</span><span class="v" id="s-ph">&mdash;</span></div>
+<div class="row"><span class="k">Invoice Email</span><span class="v" id="s-inv">&mdash;</span></div>
+<div class="row"><span class="k">Billing Address</span><span class="v" id="s-ba">&mdash;</span></div>
+<div class="row"><span class="k">Delivery &amp; Hours</span><span class="v" id="s-da">&mdash;</span></div>
+<div class="row"><span class="k">Website</span><span class="v" id="s-web">&mdash;</span></div>
+<div class="row"><span class="k">Social</span><span class="v" id="s-soc">&mdash;</span></div>
+<div class="row"><span class="k">Account Intention</span><span class="v" id="s-int">&mdash;</span></div>
+<div class="row"><span class="k">Products of Interest</span><span class="v" id="s-prod">&mdash;</span></div>
+</div>
+<div class="actions">
+<button class="btn-approve" type="button" onclick="approveAndEmail()">Approve &mdash; Email Agreement to Client</button>
+<button class="btn-copy" type="button" onclick="copyLink()">Copy Signing Link</button>
+<p class="fine">Approve opens a ready-to-send email to the applicant with their personal signing link. Review it, then hit send. Internal page &mdash; do not forward this URL.</p>
+</div>
+</div>
+<footer class="foot"><span>Bauer's Brew Co. LLC &middot; Internal Use Only</span></footer>
+</div>
+<script>
+var p=new URLSearchParams(location.search);
+var agreeURL='https://wholesale.bauersbrew.com/agreement.html?'+p.toString();
+function g(k){var v=p.get(k);return v&&v.trim()?v.trim():'';}
+(function(){
+var map={bn:'s-bn',dba:'s-dba',bt:'s-bt',rep:'s-rep',em:'s-em',ph:'s-ph',inv:'s-inv',ba:'s-ba',da:'s-da',web:'s-web',soc:'s-soc',int:'s-int',prod:'s-prod'};
+for(var k in map){var v=g(k);if(v)document.getElementById(map[k]).textContent=v;}
+if(g('bn'))document.getElementById('stripBiz').textContent=g('bn');
+if(!g('inv'))document.getElementById('s-inv').textContent='(same as email)';
+if(!g('da'))document.getElementById('s-da').textContent='(same as billing)';
+})();
+function approveAndEmail(){
+var em=g('em');
+if(!em){alert('No applicant email found in this link.');return;}
+var bn=g('bn')||'your business';
+var first=(g('rep').split(' ')[0])||'there';
+var subject='Approved \u2014 Your Bauer\u2019s Brew Wholesale Agreement';
+var body='Hi '+first+',\n\nGreat news \u2014 your wholesale application for '+bn+' has been approved!\n\nYour next step is to review and sign the Wholesale Agreement using your personal signing link:\n\n'+agreeURL+'\n\nReview the terms, sign, and submit \u2014 you\u2019ll see instant confirmation and can save a PDF copy for your records. We\u2019ll follow up right after with everything you need to place your first order.\n\nQuestions? Just reply to this email.\n\nMike Bauer\nBauer\u2019s Brew Co. LLC\nsales@bauersbrew.com';
+location.href='mailto:'+encodeURIComponent(em)+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+}
+function copyLink(){
+if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(agreeURL).then(function(){alert('Signing link copied.');},function(){prompt('Copy the signing link:',agreeURL);});}
+else{prompt('Copy the signing link:',agreeURL);}
+}
+</script>
+</body></html>
