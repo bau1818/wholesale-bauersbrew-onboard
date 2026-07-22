@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bauer's Brew — Wholesale Onboarding Preview Hub</title>
+<meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Besley:wght@400;600;700;900&family=Noto+Serif:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--gold:#E8B63B;--gdk:#C99D28;--black:#000;--white:#fff;--off:#F9F7F2;--border:#DDD8CC;--text:#111;--muted:#7A7060;--fd:'Besley',Georgia,serif;--fb:'Noto Serif',Georgia,serif;--fm:'Space Mono',monospace;}
+body{background:var(--off);color:var(--text);font-family:var(--fb);line-height:1.6;padding:24px 16px 60px;}
+.wrap{max-width:760px;margin:0 auto;}
+.head{background:var(--black);border-bottom:3px solid var(--gold);padding:26px 28px;text-align:center;}
+.head .kick{font-family:var(--fm);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.head h1{font-family:var(--fd);font-weight:900;font-size:clamp(19px,4.5vw,26px);letter-spacing:.03em;text-transform:uppercase;color:var(--white);line-height:1.2;}
+.head .sub{font-family:var(--fm);font-size:11px;letter-spacing:.05em;color:rgba(255,255,255,.75);margin-top:10px;line-height:1.5;}
+.band{font-family:var(--fm);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:28px 4px 12px;display:flex;align-items:center;gap:10px;}
+.band::after{content:"";flex:1;height:1px;background:var(--border);}
+.card{background:var(--white);border:1px solid var(--border);border-left:3px solid var(--gold);padding:18px 20px;margin-bottom:12px;display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;}
+.num{font-family:var(--fd);font-weight:900;font-size:22px;color:var(--gold);line-height:1;min-width:26px;}
+.body{flex:1;min-width:200px;}
+.body h2{font-family:var(--fd);font-weight:700;font-size:16px;letter-spacing:.02em;color:var(--black);margin-bottom:3px;}
+.body p{font-size:13.5px;color:#444;line-height:1.5;}
+.body .url{font-family:var(--fm);font-size:10px;color:var(--muted);word-break:break-all;margin-top:8px;display:block;}
+.go{font-family:var(--fm);font-weight:700;font-size:11px;letter-spacing:.08em;text-transform:uppercase;background:var(--gold);color:var(--black);text-decoration:none;padding:11px 18px;white-space:nowrap;align-self:center;transition:background .15s;}
+.go:hover{background:var(--gdk);}
+.note{background:var(--white);border:1px dashed var(--border);padding:16px 20px;margin-top:24px;font-size:12.5px;color:#555;line-height:1.7;}
+.note b{color:var(--black);}
+.foot{text-align:center;font-family:var(--fm);font-size:10px;letter-spacing:.06em;color:var(--muted);margin-top:26px;}
+@media(max-width:520px){.go{width:100%;text-align:center;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="head">
+<div class="kick">Bauer's Brew · Internal</div>
+<h1>Wholesale Onboarding<br>Preview Hub</h1>
+<div class="sub">Every stage the client sees — live.<br>Edit a real page, reload here, and the change shows.</div>
+</div>
+<div class="band">Client-Facing Flow</div>
+<div class="card">
+<div class="num">1</div>
+<div class="body">
+<h2>Application Form</h2>
+<p>What a prospect fills out first to request a wholesale account.</p>
+<span class="url">wholesale.bauersbrew.com</span>
+</div>
+<a class="go" href="https://wholesale.bauersbrew.com/" target="_blank" rel="noopener">Open ↗</a>
+</div>
+<div class="card">
+<div class="num">2</div>
+<div class="body">
+<h2>Application Received</h2>
+<p>Confirmation screen shown right after they submit the form.</p>
+<span class="url">wholesale.bauersbrew.com/thanks</span>
+</div>
+<a class="go" href="https://wholesale.bauersbrew.com/thanks" target="_blank" rel="noopener">Open ↗</a>
+</div>
+<div class="card">
+<div class="num">3</div>
+<div class="body">
+<h2>Agreement &amp; Signing</h2>
+<p>The signing page with sample client data pre-filled — exactly as an approved client receives it.</p>
+<span class="url">wholesale.bauersbrew.com/agreement · sample data</span>
+</div>
+<a class="go" href="https://wholesale.bauersbrew.com/agreement?bn=Rise%20Coffee%20Bar%20LLC&amp;dba=Rise%20Coffee&amp;bt=Cafe&amp;rep=Jane%20Smith&amp;em=jane@risecoffee.com&amp;ph=6315551234&amp;inv=billing@risecoffee.com&amp;ba=50%20E%2023rd%20St%2C%20Huntington%20NY%2011746&amp;da=Same%20as%20billing&amp;web=risecoffee.com&amp;soc=@risecoffee&amp;int=Resale&amp;prod=RTD%20Cold%20Brew%20Bottles%2C%20Roasted%20Coffee%20Bags" target="_blank" rel="noopener">Open ↗</a>
+</div>
+<div class="band">Internal — What You See</div>
+<div class="card">
+<div class="num">4</div>
+<div class="body">
+<h2>Review &amp; Approve</h2>
+<p>Where you review a submitted application and one-tap email the client their signing link. Shown with sample data.</p>
+<span class="url">wholesale.bauersbrew.com/approve · sample data</span>
+</div>
+<a class="go" href="https://wholesale.bauersbrew.com/approve?bn=Rise%20Coffee%20Bar%20LLC&amp;dba=Rise%20Coffee&amp;bt=Cafe&amp;rep=Jane%20Smith&amp;em=jane@risecoffee.com&amp;ph=6315551234&amp;inv=billing@risecoffee.com&amp;ba=50%20E%2023rd%20St%2C%20Huntington%20NY%2011746&amp;da=Same%20as%20billing&amp;web=risecoffee.com&amp;soc=@risecoffee&amp;int=Resale&amp;prod=RTD%20Cold%20Brew%20Bottles%2C%20Roasted%20Coffee%20Bags" target="_blank" rel="noopener">Open ↗</a>
+</div>
+<div class="band">Reference — Shareable</div>
+<div class="card">
+<div class="num">5</div>
+<div class="body">
+<h2>Terms &amp; Conditions</h2>
+<p>Standalone wholesale terms — the same 8 clauses as the agreement. This is the link to put on your line sheet.</p>
+<span class="url">wholesale.bauersbrew.com/terms</span>
+</div>
+<a class="go" href="https://wholesale.bauersbrew.com/terms" target="_blank" rel="noopener">Open ↗</a>
+</div>
+<div class="note">
+<b>This hub now lives on your own domain</b> — <b>wholesale.bauersbrew.com/preview</b> — and every link above opens your real site. The old vercel.app preview address can be retired.<br><br>
+<b>One preview gap:</b> the "Agreement Executed" success screen only appears after a real submit. A preview trigger can be added so you can see it on its own — minor, whenever you want it.
+</div>
+<div class="foot">Bauer's Brew Co. LLC · Internal preview tool · Not indexed</div>
+</div>
+</body>
+</html>
