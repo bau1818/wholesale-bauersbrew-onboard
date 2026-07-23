@@ -80,12 +80,9 @@ module.exports = async (req, res) => {
 
   const text =
     'Hi there,\n\n' +
-    "Thanks so much for your interest in Bauer's Brew wholesale! Our current " +
-    'wholesale catalog and line sheet is attached — inside you\'ll find our full ' +
-    "lineup, from RTD cold brew and Cold'Spresso to roasted coffee bags and kegs, " +
-    'along with pack sizes and everything you need to plan an order.\n\n' +
-    'Ready to open an account or have a question? Just reply to this email and a ' +
-    "real person here will take care of you.\n\n" +
+    "Thank you for your interest in Bauer's Brew wholesale! Our line sheet is " +
+    'attached, with all the information you need.\n\n' +
+    "Any questions, just reply to this email — we're happy to help.\n\n" +
     'Warmly,\n' +
     "The Bauer's Brew Team\n" +
     'sales@bauersbrew.com';
@@ -93,12 +90,9 @@ module.exports = async (req, res) => {
   const html =
     '<div style="font-family:Georgia,\'Times New Roman\',serif;font-size:15px;line-height:1.6;color:#111;">' +
     '<p>Hi there,</p>' +
-    "<p>Thanks so much for your interest in <strong>Bauer's Brew</strong> wholesale! " +
-    'Our current wholesale catalog and line sheet is attached — inside you\'ll find ' +
-    "our full lineup, from RTD cold brew and Cold&rsquo;Spresso to roasted coffee bags " +
-    'and kegs, along with pack sizes and everything you need to plan an order.</p>' +
-    '<p>Ready to open an account or have a question? Just reply to this email and a ' +
-    'real person here will take care of you.</p>' +
+    "<p>Thank you for your interest in <strong>Bauer's Brew</strong> wholesale! " +
+    'Our line sheet is attached, with all the information you need.</p>' +
+    "<p>Any questions, just reply to this email &mdash; we're happy to help.</p>" +
     '<p style="margin-top:22px;">Warmly,<br>' +
     "The Bauer's Brew Team<br>" +
     '<a href="mailto:sales@bauersbrew.com" style="color:#C99D28;">sales@bauersbrew.com</a></p>' +
@@ -114,10 +108,9 @@ module.exports = async (req, res) => {
 
     await transporter.sendMail({
       from: `"Bauer's Brew Wholesale" <${fromAddress}>`,
-      sender: user, // envelope sender = the authenticated account (keeps Gmail happy)
       replyTo: fromAddress,
       to: email,
-      subject: "Your Bauer's Brew Wholesale Catalog",
+      subject: "Your Bauer's Brew Wholesale Line Sheet",
       text,
       html,
       attachments: [
@@ -132,6 +125,6 @@ module.exports = async (req, res) => {
     return res.status(200).json({ ok: true });
   } catch (err) {
     console.error('send-catalog: failed to send', err && err.message ? err.message : err);
-    return res.status(502).json({ error: 'Could not send the catalog. Please try again.' });
+    return res.status(502).json({ error: 'Could not send the line sheet. Please try again.' });
   }
 };

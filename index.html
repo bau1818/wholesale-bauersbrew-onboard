@@ -164,7 +164,7 @@ body{background:#fff;padding:0;font-size:10.5px;}
 .reqinfo-row input{flex:1;min-width:0;background:#fff;border:1px solid var(--border);padding:10px 12px;font-family:var(--fb);font-size:13px;}
 .btn-req{flex:none;background:var(--gold);color:var(--black);border:none;font-family:var(--fm);font-weight:700;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding:10px 16px;cursor:pointer;white-space:nowrap;}
 .btn-req:hover{background:var(--gdk);}
-.reqinfo-fine{font-family:var(--fm);font-size:8.5px;color:rgba(255,255,255,.55);margin-top:6px;letter-spacing:.03em;}
+.reqinfo-fine{font-family:var(--fb);font-size:13.5px;color:rgba(255,255,255,.9);margin-top:10px;letter-spacing:.01em;line-height:1.45;}
 </style>
 </head>
 <body>
@@ -186,7 +186,7 @@ body{background:#fff;padding:0;font-size:10.5px;}
 <input type="email" id="reqemail" placeholder="your@email.com" autocomplete="email">
 <button class="btn-req" type="button" onclick="reqInfo()">Request Info</button>
 </div>
-<p class="reqinfo-fine">We&rsquo;ll personally send our current Wholesale Catalog to your inbox.</p>
+<p class="reqinfo-fine">Enter your email to receive our wholesale product information and account term details.</p>
 </div>
 <div class="sec">
 <div class="sec-head"><h2 class="sec-title">Business Information</h2></div>
@@ -298,7 +298,7 @@ body{background:#fff;padding:0;font-size:10.5px;}
 <label class="irow"><input type="checkbox" name="products" value="Kegs / Bag-in-Box"><span class="irow-label" style="text-transform:none;">Kegs / Bag-in-Box</span></label>
 <label class="irow"><input type="checkbox" name="products" value="Service Use"><span class="irow-label" style="text-transform:none;">Service Use</span></label>
 </div>
-<p class="st120-req" style="margin-top:6px;">Pricing, order minimums, and full product details are available in our Wholesale Catalog.</p>
+<p class="st120-req" style="margin-top:6px;">Pricing, order minimums, and full product details are available in our Wholesale Line Sheet.</p>
 </div>
 <div class="f c12">
 <div class="st120-notice">
@@ -354,13 +354,13 @@ alert('Please enter a valid email address.');return;
 }
 var btn=document.querySelector('.btn-req');
 btn.disabled=true;btn.textContent='Sending\u2026';
-/* Auto-send the wholesale catalog PDF straight to the visitor's inbox */
+/* Auto-send the wholesale line sheet PDF straight to the visitor's inbox */
 fetch('/api/send-catalog',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:em})}).catch(function(){});
 fetch('https://formspree.io/f/mjgqndpl',{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify({_subject:'Catalog Request \u2014 Wholesale','Request Type':'Wholesale Catalog Request','Email':em})})
 .then(function(r){
 if(r.ok){
 var fine=document.querySelector('.reqinfo-fine');
-fine.textContent='\u2713 Request sent \u2014 your catalog is on its way.';
+fine.textContent='\u2713 Sent! Check your inbox \u2014 and your SPAM / JUNK folder \u2014 for our line sheet.';
 fine.style.color='#E8B63B';
 btn.textContent='Sent';
 }else{throw new Error();}
