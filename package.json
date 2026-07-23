@@ -1,0 +1,9 @@
+{
+  "name": "wholesale-bauersbrew-onboard",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Bauer's Brew wholesale onboarding site + catalog-delivery serverless function.",
+  "dependencies": {
+    "nodemailer": "^6.9.16"
+  }
+}

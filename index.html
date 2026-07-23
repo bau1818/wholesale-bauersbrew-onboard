@@ -354,6 +354,8 @@ alert('Please enter a valid email address.');return;
 }
 var btn=document.querySelector('.btn-req');
 btn.disabled=true;btn.textContent='Sending\u2026';
+/* Auto-send the wholesale catalog PDF straight to the visitor's inbox */
+fetch('/api/send-catalog',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:em})}).catch(function(){});
 fetch('https://formspree.io/f/mjgqndpl',{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify({_subject:'Catalog Request \u2014 Wholesale','Request Type':'Wholesale Catalog Request','Email':em})})
 .then(function(r){
 if(r.ok){
