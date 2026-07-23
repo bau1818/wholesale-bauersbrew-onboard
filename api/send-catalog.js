@@ -5,8 +5,13 @@
 // repo-root PDF attached.
 //
 // Required environment variables (set in the Vercel project):
-//   GMAIL_USER          = sales@bauersbrew.com
+//   GMAIL_USER          = the Gmail/Workspace account that authenticates
+//                         (e.g. mike@bauersbrew.com)
 //   GMAIL_APP_PASSWORD  = 16-character Google App Password (spaces optional)
+//   GMAIL_FROM          = optional; the visible "From" address.
+//                         Defaults to sales@bauersbrew.com. The auth account
+//                         must be allowed to "send as" this address (it is,
+//                         automatically, when it's an alias of that account).
 //
 // To update the catalog later: replace the same-named PDF in the repo root
 // and push. Nothing here needs to change.
@@ -62,8 +67,9 @@ module.exports = async (req, res) => {
     return res.status(400).json({ error: 'Please provide a valid email address.' });
   }
 
-  const user = process.env.GMAIL_USER;
+  const user = process.env.GMAIL_USER; // account that authenticates to Gmail SMTP
   const pass = (process.env.GMAIL_APP_PASSWORD || '').replace(/\s/g, ''); // strip spaces from app password
+  const fromAddress = process.env.GMAIL_FROM || 'sales@bauersbrew.com'; // visible sender
 
   if (!user || !pass) {
     console.error('send-catalog: GMAIL_USER / GMAIL_APP_PASSWORD not configured');
@@ -107,7 +113,9 @@ module.exports = async (req, res) => {
     });
 
     await transporter.sendMail({
-      from: `"Bauer's Brew Wholesale" <${user}>`,
+      from: `"Bauer's Brew Wholesale" <${fromAddress}>`,
+      sender: user, // envelope sender = the authenticated account (keeps Gmail happy)
+      replyTo: fromAddress,
       to: email,
       subject: "Your Bauer's Brew Wholesale Catalog",
       text,
