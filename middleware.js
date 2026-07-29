@@ -5,7 +5,7 @@
 // Uses a branded cookie-based login page (not the browser Basic Auth popup,
 // which Vercel's header handling makes unreliable).
 export const config = {
-  matcher: ['/approve', '/approve.html', '/preview', '/preview.html'],
+  matcher: ['/approve', '/approve.html', '/preview', '/preview.html', '/accounts', '/accounts.html'],
 };
 
 const PASSWORD = 'C0dycawfee!';

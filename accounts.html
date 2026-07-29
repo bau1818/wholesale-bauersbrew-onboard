@@ -1,0 +1,66 @@
+<!doctype html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Wholesale Accounts — Bauer's Brew</title>
+<link href="https://fonts.googleapis.com/css2?family=Besley:wght@400;700;900&family=Noto+Serif:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#E8B63B;--gdk:#C99D28;--black:#111;--off:#F9F7F2;--border:#DDD8CC;--muted:#7A7060;
+--fd:'Besley',Georgia,serif;--fb:'Noto Serif',Georgia,serif;--fm:'Space Mono',monospace;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#EAE6DC;font-family:var(--fb);color:var(--black);padding:20px 12px 60px;}
+.wrap{max-width:1000px;margin:0 auto;background:#fff;border:1px solid var(--border);}
+.head{background:var(--black);border-bottom:3px solid var(--gold);padding:20px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+.head h1{font-family:var(--fd);font-weight:900;color:var(--gold);font-size:16px;letter-spacing:.06em;text-transform:uppercase;}
+.head .sub{font-family:var(--fm);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.7);}
+.bar{padding:12px 24px;border-bottom:1px solid var(--border);display:flex;gap:16px;flex-wrap:wrap;font-family:var(--fm);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);}
+.bar b{color:var(--black);}
+.msg{padding:24px;font-family:var(--fm);font-size:12px;color:var(--muted);}
+.tablewrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13.5px;}
+th{background:var(--off);font-family:var(--fm);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:11px 12px;border-bottom:1px solid var(--border);vertical-align:top;}
+tr:hover td{background:#fbfaf6;}
+.biz{font-family:var(--fd);font-weight:700;font-size:14px;}
+.dim{color:var(--muted);font-size:11.5px;}
+.pill{font-family:var(--fm);font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:2px;white-space:nowrap;}
+.pill.signed{background:#ecf7ec;color:#1c5b2a;}
+.pill.applied{background:#fef7e6;color:#8a6d1a;}
+.act a{font-family:var(--fm);font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;text-decoration:none;color:var(--gdk);border:1px solid var(--border);padding:5px 9px;display:inline-block;margin:2px 0;white-space:nowrap;}
+.act a:hover{border-color:var(--black);color:var(--black);}
+.foot{background:var(--black);padding:9px 24px;font-family:var(--fm);font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.7);}
+</style></head><body>
+<div class="wrap">
+<div class="head"><h1>Wholesale Accounts</h1><span class="sub">Bauer's Brew · Internal</span></div>
+<div class="bar" id="bar"><span>Loading&hellip;</span></div>
+<div id="content"><div class="msg">Loading accounts&hellip;</div></div>
+<div class="foot">One place for every application &amp; signed account · Bauer's Brew Co. LLC</div>
+</div>
+<script>
+var SB_URL='https://uxmrumluonnwjxyevdjv.supabase.co';
+var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV4bXJ1bWx1b25ud2p4eWV2ZGp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzNDk2MTIsImV4cCI6MjEwMDkyNTYxMn0.JEBGLcOpNJ9a5gJuqIqx88xHlL4y_bPbBQijG_r9z9Y';
+var ADMIN='bb-admin-2026';
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function fmt(iso){if(!iso)return '';var d=new Date(iso);return isNaN(d)?'':d.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});}
+fetch(SB_URL+'/rest/v1/rpc/list_accounts',{method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({secret:ADMIN})})
+.then(function(r){return r.json();})
+.then(function(rows){
+if(!Array.isArray(rows))rows=[];
+var signed=rows.filter(function(x){return x.signed;}).length;
+document.getElementById('bar').innerHTML='<span><b>'+rows.length+'</b> total</span><span><b>'+signed+'</b> signed</span><span><b>'+(rows.length-signed)+'</b> awaiting signature</span>';
+if(!rows.length){document.getElementById('content').innerHTML='<div class="msg">No accounts yet. New applications will appear here automatically.</div>';return;}
+var h='<div class="tablewrap"><table><thead><tr><th>Business</th><th>Contact</th><th>Type</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
+rows.forEach(function(x){
+var status=x.signed?'<span class="pill signed">Signed '+esc(fmt(x.signed_at))+'</span>':'<span class="pill applied">Applied '+esc(fmt(x.created_at))+'</span>';
+var pdf=x.signed?'<a href="/record?id='+encodeURIComponent(x.id)+'" target="_blank">View / PDF</a>':'<a href="/approve?id='+encodeURIComponent(x.id)+'" target="_blank">Review</a>';
+h+='<tr><td><div class="biz">'+esc(x.bn||'—')+'</div><div class="dim">'+esc(x.rep||'')+'</div></td>'
++'<td class="dim">'+esc(x.em||'')+'<br>'+esc(x.ph||'')+'</td>'
++'<td class="dim">'+esc(x.bt||'')+'</td>'
++'<td>'+status+'</td>'
++'<td class="act">'+pdf+'</td></tr>';
+});
+h+='</tbody></table></div>';
+document.getElementById('content').innerHTML=h;
+})
+.catch(function(){document.getElementById('content').innerHTML='<div class="msg" style="color:#b42318;">Could not load accounts. Refresh the page.</div>';});
+</script>
+</body></html>

@@ -183,11 +183,13 @@ setv('r-soc',data.soc);setv('r-int',data.int);setv('r-prod',data.prod);
 var pay=(sd.payopt||'')+(sd.other?' — '+sd.other:'');setv('r-pay',pay);
 setv('r-apby',sd.apby||'Mike Bauer');setv('r-apdate',sd.apdate);
 setv('r-signname',sd.signname);setv('r-signtitle',sd.signtitle,'(none)');setv('r-signdate',sd.signdate);
-if(rec.signed&&rec.signature){
-document.getElementById('sigImg').src=rec.signature;
+if(rec.signed){
 setv('r-signedat',fmtDate(rec.signed_at));
 document.getElementById('consents').innerHTML='&#10003; Agreed to Terms &amp; Conditions and Payment Terms &nbsp;&middot;&nbsp; &#10003; Communication check-in consent &nbsp;&middot;&nbsp; &#10003; Brand Use &amp; Cross-Promotion (Clause 7)';
 bar.className='status ok';bar.textContent='✓ Signed & executed — '+(fmtDate(rec.signed_at)||'');
+var sg=document.getElementById('sigImg');
+if(rec.signature&&String(rec.signature).indexOf('data:image')===0){sg.src=rec.signature;}
+else{sg.parentNode.innerHTML='<span style="font-family:var(--fm);font-size:11px;color:#1c5b2a;">&#10003; Signed on file &mdash; signature retained in the official signed PDF.</span>';}
 }else{
 bar.className='status pending';bar.textContent='Application on file — not yet signed by the client.';
 document.getElementById('sigImg').alt='(not yet signed)';
