@@ -370,16 +370,22 @@ btn.disabled=false;btn.textContent='Request Info';
 alert('Could not send \u2014 please check your connection and try again.');
 });
 }
+function b64urlEncode(str){
+var utf8=encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,function(_,h){return String.fromCharCode(parseInt(h,16));});
+return btoa(utf8).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
 function buildLink(){
 var intents=[...document.querySelectorAll('input[name="intent"]:checked')].map(function(e){return e.value;}).join(', ')||'—';
 var prods=[...document.querySelectorAll('input[name="products"]:checked')].map(function(e){return e.value;}).join(', ')||'—';
-var q=function(id){return encodeURIComponent(fv(id));};
-return 'bn='+q('bizname')+'&dba='+q('dba')+'&bt='+encodeURIComponent(fv('biztype')+(fv('biztype-other')?' — '+fv('biztype-other'):''))
-+'&rep='+q('owner')+'&em='+q('email')+'&ph='+q('phone')+'&inv='+q('invoiceemail')
-+'&ba='+encodeURIComponent(fv('addr').replace(/\n/g,', '))
-+'&da='+encodeURIComponent(fv('delivery').replace(/\n/g,', '))
-+'&web='+q('website')+'&soc='+q('social')
-+'&prod='+encodeURIComponent(prods)+'&int='+encodeURIComponent(intents+(fv('intent-other-txt')?' (other: '+fv('intent-other-txt')+')':''));
+var data={
+bn:fv('bizname'),dba:fv('dba'),
+bt:fv('biztype')+(fv('biztype-other')?' — '+fv('biztype-other'):''),
+rep:fv('owner'),em:fv('email'),ph:fv('phone'),inv:fv('invoiceemail'),
+ba:fv('addr').replace(/\n/g,', '),da:fv('delivery').replace(/\n/g,', '),
+web:fv('website'),soc:fv('social'),prod:prods,
+int:intents+(fv('intent-other-txt')?' (other: '+fv('intent-other-txt')+')':'')
+};
+return 'd=x'+b64urlEncode(JSON.stringify(data));
 }
 function wsSubmit(){
 var intentChecked=[...document.querySelectorAll('input[name="intent"]:checked')].length>0;

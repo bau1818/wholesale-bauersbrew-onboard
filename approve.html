@@ -62,8 +62,21 @@ body{background:#EAE6DC;font-family:var(--fb);color:var(--black);padding:24px 12
 </div>
 <script>
 var p=new URLSearchParams(location.search);
-var agreeURL='https://wholesale.bauersbrew.com/agreement?'+p.toString();
-function g(k){var v=p.get(k);return v&&v.trim()?v.trim():'';}
+var KEYS=['bn','dba','bt','rep','em','ph','inv','ba','da','web','soc','prod','int'];
+function b64urlEncode(str){
+var utf8=encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,function(_,h){return String.fromCharCode(parseInt(h,16));});
+return btoa(utf8).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function b64urlDecode(t){
+t=t.replace(/-/g,'+').replace(/_/g,'/');while(t.length%4)t+='=';
+var bin=atob(t),pct='';for(var i=0;i<bin.length;i++){pct+='%'+('00'+bin.charCodeAt(i).toString(16)).slice(-2);}
+return decodeURIComponent(pct);
+}
+var DATA=null;
+(function(){var d=p.get('d');if(d){try{DATA=JSON.parse(b64urlDecode(d.charAt(0)==='x'?d.slice(1):d));}catch(e){DATA=null;}}})();
+function g(k){var dv=(DATA&&DATA[k]!=null)?String(DATA[k]).trim():'';if(dv)return dv;var v=p.get(k);return v&&v.trim()?v.trim():'';}
+function currentData(){if(DATA)return DATA;var o={};KEYS.forEach(function(k){o[k]=g(k);});return o;}
+var agreeURL='https://wholesale.bauersbrew.com/agreement?d=x'+b64urlEncode(JSON.stringify(currentData()));
 (function(){
 var map={bn:'s-bn',dba:'s-dba',bt:'s-bt',rep:'s-rep',em:'s-em',ph:'s-ph',inv:'s-inv',ba:'s-ba',da:'s-da',web:'s-web',soc:'s-soc',int:'s-int',prod:'s-prod'};
 for(var k in map){var v=g(k);if(v)document.getElementById(map[k]).textContent=v;}

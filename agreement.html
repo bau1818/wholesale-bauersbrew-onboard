@@ -500,17 +500,24 @@ p.scrollIntoView({behavior:'smooth',block:'center'});
 /* ── Prefill from URL params ── */
 (function(){
 var p=new URLSearchParams(location.search);
-function set(id,key){var el=document.getElementById(id),v=p.get(key);if(el&&v&&v.trim())el.textContent=v;}
+function b64urlDecode(t){
+t=t.replace(/-/g,'+').replace(/_/g,'/');while(t.length%4)t+='=';
+var bin=atob(t),pct='';for(var i=0;i<bin.length;i++){pct+='%'+('00'+bin.charCodeAt(i).toString(16)).slice(-2);}
+return decodeURIComponent(pct);
+}
+var DATA=null;var d=p.get('d');if(d){try{DATA=JSON.parse(b64urlDecode(d.charAt(0)==='x'?d.slice(1):d));}catch(e){DATA=null;}}
+function gv(key){if(DATA&&DATA[key]!=null){var dv=String(DATA[key]).trim();if(dv)return dv;}var v=p.get(key);return v&&v.trim()?v.trim():'';}
+function set(id,key){var el=document.getElementById(id),v=gv(key);if(el&&v)el.textContent=v;}
 ['bn:v-bn','dba:v-dba','bt:v-bt','rep:v-rep','em:v-em','ph:v-ph','inv:v-inv','ba:v-ba','da:v-da','web:v-web','soc:v-soc','int:v-int','prod:v-prod'].forEach(function(m){
 var a=m.split(':');set(a[1],a[0]);
 });
-var bn=p.get('bn');if(bn){var s=document.getElementById('stripBiz');if(s)s.textContent=bn;}
+var bn=gv('bn');if(bn){var s=document.getElementById('stripBiz');if(s)s.textContent=bn;}
 var inv=document.getElementById('v-inv');if(inv&&inv.textContent.trim()==='—')inv.textContent='(same as email)';
 var da=document.getElementById('v-da');if(da&&da.textContent.trim()==='—')da.textContent='(same as billing)';
-var d=new Date(),today=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+var dt=new Date(),today=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
 document.getElementById('apDate').textContent=p.get('ap')||today;
 document.getElementById('apBy').textContent=p.get('apby')||"Mike Bauer";
-var rep=p.get('rep');var sn=document.getElementById('signname');if(rep&&sn&&!sn.value)sn.value=rep;
+var rep=gv('rep');var sn=document.getElementById('signname');if(rep&&sn&&!sn.value)sn.value=rep;
 })();
 </script>
 </body>
