@@ -63,6 +63,9 @@ body{background:#EAE6DC;font-family:var(--fb);color:var(--black);padding:24px 12
 <script>
 var p=new URLSearchParams(location.search);
 var KEYS=['bn','dba','bt','rep','em','ph','inv','ba','da','web','soc','prod','int'];
+var SB_URL='https://uxmrumluonnwjxyevdjv.supabase.co';
+var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV4bXJ1bWx1b25ud2p4eWV2ZGp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzNDk2MTIsImV4cCI6MjEwMDkyNTYxMn0.JEBGLcOpNJ9a5gJuqIqx88xHlL4y_bPbBQijG_r9z9Y';
+function sbRpc(fn,args){return fetch(SB_URL+'/rest/v1/rpc/'+fn,{method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'},body:JSON.stringify(args||{})}).then(function(r){if(!r.ok){return r.text().then(function(t){throw new Error('sb'+r.status);});}return r.json();});}
 function b64urlEncode(str){
 var utf8=encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,function(_,h){return String.fromCharCode(parseInt(h,16));});
 return btoa(utf8).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
@@ -72,23 +75,32 @@ t=t.replace(/-/g,'+').replace(/_/g,'/');while(t.length%4)t+='=';
 var bin=atob(t),pct='';for(var i=0;i<bin.length;i++){pct+='%'+('00'+bin.charCodeAt(i).toString(16)).slice(-2);}
 return decodeURIComponent(pct);
 }
-var DATA=null;
-(function(){var d=p.get('d');if(d){try{DATA=JSON.parse(b64urlDecode(d.charAt(0)==='x'?d.slice(1):d));}catch(e){DATA=null;}}})();
-function g(k){var dv=(DATA&&DATA[k]!=null)?String(DATA[k]).trim():'';if(dv)return dv;var v=p.get(k);return v&&v.trim()?v.trim():'';}
-function currentData(){if(DATA)return DATA;var o={};KEYS.forEach(function(k){o[k]=g(k);});return o;}
-var agreeURL='https://wholesale.bauersbrew.com/agreement?d=x'+b64urlEncode(JSON.stringify(currentData()));
-(function(){
+var REC={},loaded=false,agreeURL='';
+function fill(data){
+data=data||{};REC=data;loaded=true;
 var map={bn:'s-bn',dba:'s-dba',bt:'s-bt',rep:'s-rep',em:'s-em',ph:'s-ph',inv:'s-inv',ba:'s-ba',da:'s-da',web:'s-web',soc:'s-soc',int:'s-int',prod:'s-prod'};
-for(var k in map){var v=g(k);if(v)document.getElementById(map[k]).textContent=v;}
-if(g('bn'))document.getElementById('stripBiz').textContent=g('bn');
-if(!g('inv'))document.getElementById('s-inv').textContent='(same as email)';
-if(!g('da'))document.getElementById('s-da').textContent='(same as billing)';
-})();
+for(var k in map){var v=data[k]?String(data[k]).trim():'';if(v&&v!=='\u2014')document.getElementById(map[k]).textContent=v;}
+if(data.bn)document.getElementById('stripBiz').textContent=data.bn;
+if(!data.inv||!String(data.inv).trim())document.getElementById('s-inv').textContent='(same as email)';
+if(!data.da||!String(data.da).trim())document.getElementById('s-da').textContent='(same as billing)';
+}
+var idParam=p.get('id');
+if(idParam){
+agreeURL='https://wholesale.bauersbrew.com/agreement?id='+idParam;
+sbRpc('get_submission',{code:idParam}).then(function(rec){fill(rec&&rec.data);}).catch(function(){document.getElementById('stripBiz').textContent='(could not load \u2014 refresh the page)';});
+}else{
+var DATA=null;var d=p.get('d');if(d){try{DATA=JSON.parse(b64urlDecode(d.charAt(0)==='x'?d.slice(1):d));}catch(e){DATA=null;}}
+var gL=function(k){var dv=(DATA&&DATA[k]!=null)?String(DATA[k]).trim():'';if(dv)return dv;var v=p.get(k);return v&&v.trim()?v.trim():'';};
+var data={};KEYS.forEach(function(k){data[k]=gL(k);});
+fill(data);
+agreeURL='https://wholesale.bauersbrew.com/agreement?d=x'+b64urlEncode(JSON.stringify(data));
+}
 function approveAndEmail(){
-var em=g('em');
+if(!loaded){alert('Still loading this application \u2014 one moment, then tap Approve again.');return;}
+var em=(REC.em||'').trim();
 if(!em){alert('No applicant email found in this link.');return;}
-var bn=g('bn')||'your business';
-var first=(g('rep').split(' ')[0])||'there';
+var bn=(REC.bn||'your business').trim();
+var first=((REC.rep||'').split(' ')[0])||'there';
 var subject='Approved \u2014 Your Bauer\u2019s Brew Wholesale Agreement';
 var body='Hi '+first+',\n\nGreat news \u2014 your wholesale application for '+bn+' has been approved!\n\nYour next step is to review and sign the Wholesale Agreement using your personal signing link:\n\n'+agreeURL+'\n\nReview the terms, sign, and submit \u2014 you\u2019ll see instant confirmation and can save a PDF copy for your records. We\u2019ll follow up right after with everything you need to place your first order.\n\nQuestions? Just reply to this email.\n\nMike Bauer\nBauer\u2019s Brew Co. LLC\nsales@bauersbrew.com';
 location.href='mailto:'+encodeURIComponent(em)+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);

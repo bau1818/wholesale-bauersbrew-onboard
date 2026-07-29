@@ -5,5 +5,11 @@
     "api/send-catalog.js": {
       "includeFiles": "Wholesale_BauersBrew_LineSheet_2026.pdf"
     }
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/keepalive",
+      "schedule": "0 7 * * *"
+    }
+  ]
 }

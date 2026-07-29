@@ -370,14 +370,20 @@ btn.disabled=false;btn.textContent='Request Info';
 alert('Could not send \u2014 please check your connection and try again.');
 });
 }
+/* ── Supabase (short-link store) ── */
+var SB_URL='https://uxmrumluonnwjxyevdjv.supabase.co';
+var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV4bXJ1bWx1b25ud2p4eWV2ZGp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzNDk2MTIsImV4cCI6MjEwMDkyNTYxMn0.JEBGLcOpNJ9a5gJuqIqx88xHlL4y_bPbBQijG_r9z9Y';
+function sbRpc(fn,args){
+return fetch(SB_URL+'/rest/v1/rpc/'+fn,{method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'},body:JSON.stringify(args||{})}).then(function(r){if(!r.ok){return r.text().then(function(t){throw new Error('sb'+r.status);});}return r.json();});
+}
 function b64urlEncode(str){
 var utf8=encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,function(_,h){return String.fromCharCode(parseInt(h,16));});
 return btoa(utf8).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 }
-function buildLink(){
+function buildData(){
 var intents=[...document.querySelectorAll('input[name="intent"]:checked')].map(function(e){return e.value;}).join(', ')||'—';
 var prods=[...document.querySelectorAll('input[name="products"]:checked')].map(function(e){return e.value;}).join(', ')||'—';
-var data={
+return {
 bn:fv('bizname'),dba:fv('dba'),
 bt:fv('biztype')+(fv('biztype-other')?' — '+fv('biztype-other'):''),
 rep:fv('owner'),em:fv('email'),ph:fv('phone'),inv:fv('invoiceemail'),
@@ -385,7 +391,14 @@ ba:fv('addr').replace(/\n/g,', '),da:fv('delivery').replace(/\n/g,', '),
 web:fv('website'),soc:fv('social'),prod:prods,
 int:intents+(fv('intent-other-txt')?' (other: '+fv('intent-other-txt')+')':'')
 };
-return 'd=x'+b64urlEncode(JSON.stringify(data));
+}
+/* Short link via Supabase; falls back to the self-contained ?d=x token if the store is unreachable, so submissions never break. */
+function fallbackLink(data){return 'https://wholesale.bauersbrew.com/approve.html?d=x'+b64urlEncode(JSON.stringify(data));}
+function getMagic(data){
+return sbRpc('create_submission',{payload:data}).then(function(code){
+if(code&&typeof code==='string')return 'https://wholesale.bauersbrew.com/approve?id='+code;
+throw new Error('no code');
+}).catch(function(){return fallbackLink(data);});
 }
 function wsSubmit(){
 var intentChecked=[...document.querySelectorAll('input[name="intent"]:checked')].length>0;
@@ -405,10 +418,10 @@ alert('Please complete all required fields (*) before submitting.');return;
 }
 var intents=[...document.querySelectorAll('input[name="intent"]:checked')].map(function(e){return e.value;}).join(', ')||'\u2014';
 var prods=[...document.querySelectorAll('input[name="products"]:checked')].map(function(e){return e.value;}).join(', ')||'\u2014';
-var magic='https://wholesale.bauersbrew.com/approve.html?'+buildLink();
 var btn=document.querySelector('.btn-submit');
 btn.disabled=true;btn.textContent='Submitting\u2026';
-fetch('https://formspree.io/f/mjgqndpl',{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify({
+getMagic(buildData()).then(function(magic){
+return fetch('https://formspree.io/f/mjgqndpl',{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify({
 _subject:'Wholesale Application \u2014 '+fv('bizname'),
 'Legal Business Name':fv('bizname'),
 'DBA':fv('dba')||'(none)',
@@ -425,10 +438,11 @@ _subject:'Wholesale Application \u2014 '+fv('bizname'),
 'Account Intention':intents+(fv('intent-other-txt')?' (other: '+fv('intent-other-txt')+')':''),
 'Products of Interest':prods,
 'REVIEW & APPROVE \u2014 open this link to review the application and send the agreement':magic
-})})
+})});
+})
 .then(function(r){
-if(r.ok){window.location.href='thanks';}
-else{throw new Error();}
+if(r.ok){window.location.href='thanks';return;}
+throw new Error();
 })
 .catch(function(){
 btn.disabled=false;btn.textContent='Submit Application';

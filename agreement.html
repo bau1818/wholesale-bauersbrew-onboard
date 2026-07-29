@@ -354,6 +354,11 @@ I have read and agree to the Terms &amp; Conditions and Payment Terms above. I a
 var d=new Date(),el=document.getElementById('signdate');
 if(el) el.value=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 })();
+/* ── Supabase (short-link store) ── */
+var SB_URL='https://uxmrumluonnwjxyevdjv.supabase.co';
+var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV4bXJ1bWx1b25ud2p4eWV2ZGp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzNDk2MTIsImV4cCI6MjEwMDkyNTYxMn0.JEBGLcOpNJ9a5gJuqIqx88xHlL4y_bPbBQijG_r9z9Y';
+function sbRpc(fn,args){return fetch(SB_URL+'/rest/v1/rpc/'+fn,{method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'},body:JSON.stringify(args||{})}).then(function(r){if(!r.ok){return r.text().then(function(t){throw new Error('sb'+r.status);});}return r.json();});}
+var SUB_CODE=null,RECDATA={};
 /* ── Business type Other ── */
 function toggleBizOther(sel){
 var wrap=document.getElementById('biztype-other-wrap');
@@ -436,7 +441,10 @@ alert('Please complete all required fields (*).');return;
 var pay=document.querySelector('input[name="payopt"]:checked');
 var btn=document.querySelector('.btn-submit');
 btn.disabled=true;btn.textContent='Submitting\u2026';
-fetch('https://formspree.io/f/xdarqvpj',{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify({
+var sig=canvas.toDataURL('image/png');
+var signedInfo={payopt:(pay?pay.value:''),other:fv('other-payment'),signname:fv('signname'),signtitle:fv('signtitle'),signdate:fv('signdate'),apby:pv('apBy'),apdate:pv('apDate')};
+function submitFormspree(extra){
+var base={
 _subject:'SIGNED Wholesale Agreement \u2014 '+pv('v-bn'),
 'Legal Business Name':pv('v-bn'),
 'DBA':pv('v-dba'),
@@ -459,9 +467,27 @@ _subject:'SIGNED Wholesale Agreement \u2014 '+pv('v-bn'),
 'Brand Use & Cross-Promotion Agreed':'YES',
 'Signed By (Printed Name)':fv('signname'),
 'Signer Title':fv('signtitle')||'(none)',
-'Signature Date':fv('signdate'),
-'Drawn Signature (PNG data \u2014 paste into browser address bar to view)':canvas.toDataURL('image/png')
-})})
+'Signature Date':fv('signdate')
+};
+for(var k in extra){base[k]=extra[k];}
+return fetch('https://formspree.io/f/xdarqvpj',{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify(base)});
+}
+function storeSigned(){
+var codeP=SUB_CODE?Promise.resolve(SUB_CODE):sbRpc('create_submission',{payload:RECDATA});
+return codeP.then(function(code){
+if(!code||typeof code!=='string')throw new Error('no code');
+SUB_CODE=code;
+return sbRpc('sign_submission',{code:code,sig:sig,signed:signedInfo}).then(function(ok){
+if(ok!==true)throw new Error('sign failed');
+return 'https://wholesale.bauersbrew.com/record?id='+code;
+});
+});
+}
+storeSigned().then(function(recordURL){
+return submitFormspree({'Signed Agreement (open to view / download PDF)':recordURL});
+},function(){
+return submitFormspree({'Drawn Signature (PNG data \u2014 paste into browser address bar to view)':sig});
+})
 .then(function(r){
 if(r.ok){showExecuted();return;}
 return r.json().catch(function(){return null;}).then(function(j){
@@ -505,19 +531,30 @@ t=t.replace(/-/g,'+').replace(/_/g,'/');while(t.length%4)t+='=';
 var bin=atob(t),pct='';for(var i=0;i<bin.length;i++){pct+='%'+('00'+bin.charCodeAt(i).toString(16)).slice(-2);}
 return decodeURIComponent(pct);
 }
-var DATA=null;var d=p.get('d');if(d){try{DATA=JSON.parse(b64urlDecode(d.charAt(0)==='x'?d.slice(1):d));}catch(e){DATA=null;}}
-function gv(key){if(DATA&&DATA[key]!=null){var dv=String(DATA[key]).trim();if(dv)return dv;}var v=p.get(key);return v&&v.trim()?v.trim():'';}
-function set(id,key){var el=document.getElementById(id),v=gv(key);if(el&&v)el.textContent=v;}
-['bn:v-bn','dba:v-dba','bt:v-bt','rep:v-rep','em:v-em','ph:v-ph','inv:v-inv','ba:v-ba','da:v-da','web:v-web','soc:v-soc','int:v-int','prod:v-prod'].forEach(function(m){
-var a=m.split(':');set(a[1],a[0]);
-});
-var bn=gv('bn');if(bn){var s=document.getElementById('stripBiz');if(s)s.textContent=bn;}
+function apply(data){
+data=data||{};RECDATA=data;
+function setv(id,v){var el=document.getElementById(id);if(el&&v&&String(v).trim()&&String(v).trim()!=='—')el.textContent=String(v).trim();}
+var map={bn:'v-bn',dba:'v-dba',bt:'v-bt',rep:'v-rep',em:'v-em',ph:'v-ph',inv:'v-inv',ba:'v-ba',da:'v-da',web:'v-web',soc:'v-soc',int:'v-int',prod:'v-prod'};
+for(var k in map){setv(map[k],data[k]);}
+if(data.bn){var s=document.getElementById('stripBiz');if(s)s.textContent=data.bn;}
 var inv=document.getElementById('v-inv');if(inv&&inv.textContent.trim()==='—')inv.textContent='(same as email)';
 var da=document.getElementById('v-da');if(da&&da.textContent.trim()==='—')da.textContent='(same as billing)';
+var rep=data.rep;var sn=document.getElementById('signname');if(rep&&sn&&!sn.value)sn.value=rep;
+}
+var idParam=p.get('id');
+if(idParam){
+SUB_CODE=idParam;
+sbRpc('get_submission',{code:idParam}).then(function(rec){apply(rec&&rec.data);}).catch(function(){});
+}else{
+var DATA=null;var d=p.get('d');if(d){try{DATA=JSON.parse(b64urlDecode(d.charAt(0)==='x'?d.slice(1):d));}catch(e){DATA=null;}}
+var gv=function(key){if(DATA&&DATA[key]!=null){var dv=String(DATA[key]).trim();if(dv)return dv;}var v=p.get(key);return v&&v.trim()?v.trim():'';};
+var KEYS=['bn','dba','bt','rep','em','ph','inv','ba','da','web','soc','prod','int'];
+var data={};KEYS.forEach(function(k){data[k]=gv(k);});
+apply(data);
+}
 var dt=new Date(),today=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
 document.getElementById('apDate').textContent=p.get('ap')||today;
 document.getElementById('apBy').textContent=p.get('apby')||"Mike Bauer";
-var rep=gv('rep');var sn=document.getElementById('signname');if(rep&&sn&&!sn.value)sn.value=rep;
 })();
 </script>
 </body>
