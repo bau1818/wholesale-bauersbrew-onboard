@@ -25,6 +25,9 @@ tr:hover td{background:#fbfaf6;}
 .pill{font-family:var(--fm);font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:2px;white-space:nowrap;}
 .pill.signed{background:#ecf7ec;color:#1c5b2a;}
 .pill.applied{background:#fef7e6;color:#8a6d1a;}
+.pill.approved{background:#eef2fb;color:#2b4a8a;}
+.csvbtn{font-family:var(--fm);font-weight:700;font-size:10px;letter-spacing:.06em;text-transform:uppercase;background:var(--gold);color:#111;border:none;padding:9px 14px;cursor:pointer;}
+.csvbtn:hover{background:var(--gdk);}
 .act a{font-family:var(--fm);font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;text-decoration:none;color:var(--gdk);border:1px solid var(--border);padding:5px 9px;display:inline-block;margin:2px 0;white-space:nowrap;}
 .act a:hover{border-color:var(--black);color:var(--black);}
 .act a.del{color:#b42318;border-color:#f0c9c4;}
@@ -32,7 +35,7 @@ tr:hover td{background:#fbfaf6;}
 .foot{background:var(--black);padding:9px 24px;font-family:var(--fm);font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.7);}
 </style></head><body>
 <div class="wrap">
-<div class="head"><h1>Wholesale Accounts</h1><span class="sub">Bauer's Brew · Internal</span></div>
+<div class="head"><h1>Wholesale Accounts</h1><div style="display:flex;gap:12px;align-items:center;"><span class="sub">Bauer's Brew · Internal</span><button class="csvbtn" id="csvbtn" onclick="downloadCSV()">Download CSV</button></div></div>
 <div class="bar" id="bar"><span>Loading&hellip;</span></div>
 <div id="content"><div class="msg">Loading accounts&hellip;</div></div>
 <div class="foot">One place for every application &amp; signed account · Bauer's Brew Co. LLC</div>
@@ -51,22 +54,46 @@ return false;
 }
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
 function fmt(iso){if(!iso)return '';var d=new Date(iso);return isNaN(d)?'':d.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});}
+var DATA_ROWS=[];
+function statusPill(x){
+if(x.signed)return '<span class="pill signed">Signed '+esc(fmt(x.signed_at))+'</span>';
+if(x.approved)return '<span class="pill approved">Approved '+esc(fmt(x.approved_at))+'</span>';
+return '<span class="pill applied">Applied '+esc(fmt(x.created_at))+'</span>';
+}
+function csvCell(s){s=String(s==null?'':s);return '"'+s.replace(/"/g,'""')+'"';}
+function downloadCSV(){
+if(!DATA_ROWS.length){alert('No accounts to export yet.');return;}
+var cols=['Business','Rep','Email','Phone','Type','Intention','Status','Applied','Approved','Signed','ST-120 on file','Record link'];
+var lines=[cols.map(csvCell).join(',')];
+DATA_ROWS.forEach(function(x){
+var status=x.signed?'Signed':(x.approved?'Approved':'Applied');
+var rec=x.signed?('https://wholesale.bauersbrew.com/record?id='+x.id):'';
+lines.push([x.bn,x.rep,x.em,x.ph,x.bt,x.int,status,fmt(x.created_at),fmt(x.approved_at),fmt(x.signed_at),x.has_st120?'Yes':'',rec].map(csvCell).join(','));
+});
+var blob=new Blob(['﻿'+lines.join('\r\n')],{type:'text/csv;charset=utf-8;'});
+var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bauersbrew-wholesale-accounts.csv';document.body.appendChild(a);a.click();
+setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(a.href);},100);
+}
 fetch(SB_URL+'/rest/v1/rpc/list_accounts',{method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({secret:ADMIN})})
 .then(function(r){return r.json();})
 .then(function(rows){
 if(!Array.isArray(rows))rows=[];
+DATA_ROWS=rows;
 var signed=rows.filter(function(x){return x.signed;}).length;
-document.getElementById('bar').innerHTML='<span><b>'+rows.length+'</b> total</span><span><b>'+signed+'</b> signed</span><span><b>'+(rows.length-signed)+'</b> awaiting signature</span>';
+var approved=rows.filter(function(x){return x.approved&&!x.signed;}).length;
+var applied=rows.filter(function(x){return !x.approved&&!x.signed;}).length;
+document.getElementById('bar').innerHTML='<span><b>'+rows.length+'</b> total</span><span><b>'+applied+'</b> new</span><span><b>'+approved+'</b> awaiting signature</span><span><b>'+signed+'</b> signed</span>';
 if(!rows.length){document.getElementById('content').innerHTML='<div class="msg">No accounts yet. New applications will appear here automatically.</div>';return;}
 var h='<div class="tablewrap"><table><thead><tr><th>Business</th><th>Contact</th><th>Type</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
 rows.forEach(function(x){
-var status=x.signed?'<span class="pill signed">Signed '+esc(fmt(x.signed_at))+'</span>':'<span class="pill applied">Applied '+esc(fmt(x.created_at))+'</span>';
-var pdf=x.signed?'<a href="/record?id='+encodeURIComponent(x.id)+'" target="_blank">View / PDF</a>':'<a href="/approve?id='+encodeURIComponent(x.id)+'" target="_blank">Review</a>';
+var id=encodeURIComponent(x.id);
+var main=x.signed?'<a href="/record?id='+id+'" target="_blank">View / PDF</a>':'<a href="/approve?id='+id+'" target="_blank">Review</a>';
+var st120=x.has_st120?' <a href="/st120?id='+id+'" target="_blank">ST-120</a>':'';
 h+='<tr><td><div class="biz">'+esc(x.bn||'—')+'</div><div class="dim">'+esc(x.rep||'')+'</div></td>'
 +'<td class="dim">'+esc(x.em||'')+'<br>'+esc(x.ph||'')+'</td>'
 +'<td class="dim">'+esc(x.bt||'')+'</td>'
-+'<td>'+status+'</td>'
-+'<td class="act">'+pdf+' <a href="#" class="del" onclick="return deleteAcct(\''+encodeURIComponent(x.id)+'\')">Delete</a></td></tr>';
++'<td>'+statusPill(x)+'</td>'
++'<td class="act">'+main+st120+' <a href="#" class="del" onclick="return deleteAcct(\''+id+'\')">Delete</a></td></tr>';
 });
 h+='</tbody></table></div>';
 document.getElementById('content').innerHTML=h;

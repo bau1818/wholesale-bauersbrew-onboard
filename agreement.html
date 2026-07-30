@@ -170,6 +170,17 @@ body{background:#fff;padding:0;font-size:10.5px;}
 .seller-meta .row{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid var(--border);padding-bottom:4px;}
 .seller-meta .row .lbl{white-space:nowrap;}
 .seller-meta .row .val{font-family:var(--fb);font-size:14.5px;font-weight:700;color:#000;text-align:right;}
+/* ST-120 resale certificate upload */
+.st120-banner{background:#fef7e6;border:1px solid var(--gold);color:#8a6d1a;font-family:var(--fm);font-size:11px;letter-spacing:.02em;line-height:1.5;padding:9px 12px;margin-bottom:11px;}
+.st120-desc{font-size:12.5px;line-height:1.6;color:#444;margin-bottom:13px;}
+.st120-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.st120-openform{font-family:var(--fm);font-weight:700;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--gdk);text-decoration:none;border:1px solid var(--border);padding:10px 14px;white-space:nowrap;}
+.st120-openform:hover{border-color:var(--black);color:var(--black);}
+.st120-upload{font-family:var(--fm);font-weight:700;font-size:10px;letter-spacing:.06em;text-transform:uppercase;background:var(--black);color:var(--gold);padding:11px 15px;cursor:pointer;display:inline-block;white-space:nowrap;}
+.st120-upload:hover{background:#222;}
+.st120-status{font-family:var(--fm);font-size:11px;margin-top:10px;min-height:14px;line-height:1.4;}
+.st120-sec-highlight{background:#fffdf6;}
+.st120-sec-highlight .sec-title{color:var(--gdk);}
 </style>
 </head>
 <body>
@@ -289,6 +300,16 @@ body{background:#fff;padding:0;font-size:10.5px;}
 <p>Either party may terminate on 30 days' written notice, or immediately for uncured material breach (15-day cure). Force majeure — including crop failure and supply disruption — excuses performance. New York law governs; disputes in Suffolk County, NY courts. Prevailing party recovers attorneys' fees and costs.</p>
 </div>
 </div>
+<div class="sec" id="st120sec">
+<div class="sec-head"><h2 class="sec-title">Resale Certificate &mdash; ST-120</h2></div>
+<div class="st120-banner" id="st120banner" style="display:none;">You selected <strong>Resale</strong> on your application &mdash; we recommend attaching a completed ST-120 so we can sell to you tax-exempt.</div>
+<p class="st120-desc">Optional. If you buy for resale, a completed New York <strong>ST-120 Resale Certificate</strong> lets us sell to you <strong>tax-exempt</strong> &mdash; so the inventory you resell isn&rsquo;t taxed twice. Attach it now, or email it to sales@bauersbrew.com later.</p>
+<div class="st120-actions">
+<a class="st120-openform" href="https://www.tax.ny.gov/pdf/current_forms/st/st120_fill_in.pdf" target="_blank" rel="noopener">&#8599; Open blank ST-120 form</a>
+<label class="st120-upload"><input type="file" id="st120file" accept="application/pdf,image/png,image/jpeg" hidden>Attach completed ST-120 (PDF or photo)</label>
+</div>
+<p class="st120-status" id="st120status"></p>
+</div>
 <div class="sec-sign">
 <div class="sec-head"><h2 class="sec-title">Client Signature</h2></div>
 <div class="ack">
@@ -358,7 +379,9 @@ if(el) el.value=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+S
 var SB_URL='https://uxmrumluonnwjxyevdjv.supabase.co';
 var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV4bXJ1bWx1b25ud2p4eWV2ZGp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzNDk2MTIsImV4cCI6MjEwMDkyNTYxMn0.JEBGLcOpNJ9a5gJuqIqx88xHlL4y_bPbBQijG_r9z9Y';
 function sbRpc(fn,args){return fetch(SB_URL+'/rest/v1/rpc/'+fn,{method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'},body:JSON.stringify(args||{})}).then(function(r){if(!r.ok){return r.text().then(function(t){throw new Error('sb'+r.status);});}return r.json();});}
-var SUB_CODE=null,RECDATA={};
+var SUB_CODE=null,RECDATA={},st120Data=null,st120Name=null;
+function setSt120Status(msg,err){var e=document.getElementById('st120status');if(e){e.textContent=msg;e.style.color=err?'#b42318':'#1c5b2a';}}
+(function(){var inp=document.getElementById('st120file');if(!inp)return;inp.addEventListener('change',function(){var f=inp.files&&inp.files[0];if(!f){st120Data=null;st120Name=null;setSt120Status('');return;}if(f.size>4*1024*1024){st120Data=null;st120Name=null;inp.value='';setSt120Status('That file is over 4 MB — please attach a smaller PDF or photo.',true);return;}var rd=new FileReader();rd.onload=function(){st120Data=rd.result;st120Name=f.name;setSt120Status('✓ Attached: '+f.name+' — it will be saved when you submit.');};rd.onerror=function(){st120Data=null;st120Name=null;setSt120Status('Could not read that file — please try again.',true);};rd.readAsDataURL(f);});})();
 /* ── Business type Other ── */
 function toggleBizOther(sel){
 var wrap=document.getElementById('biztype-other-wrap');
@@ -486,8 +509,12 @@ return 'https://wholesale.bauersbrew.com/record?id='+code;
 });
 }
 storeSigned().then(function(recordURL){
-/* Signature is safely stored \u2192 agreement executed. Notify the team (best-effort). */
+/* Signature is safely stored \u2192 agreement executed. */
+/* Attach the ST-120 upload if one was provided (best-effort). */
+if(st120Data&&SUB_CODE){sbRpc('attach_st120',{code:SUB_CODE,file:st120Data,filename:st120Name||'ST-120'}).catch(function(){});}
+/* Notify the team, and email the client their own signed copy (both best-effort). */
 notify({record:recordURL}).catch(function(){});
+if(SUB_CODE){fetch('/api/send-signed-copy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:SUB_CODE})}).catch(function(){});}
 showExecuted();
 }).catch(function(){
 /* Storage failed \u2014 email the signature so it is never lost; only then confirm. */
@@ -539,6 +566,7 @@ if(data.bn){var s=document.getElementById('stripBiz');if(s)s.textContent=data.bn
 var inv=document.getElementById('v-inv');if(inv&&inv.textContent.trim()==='—')inv.textContent='(same as email)';
 var da=document.getElementById('v-da');if(da&&da.textContent.trim()==='—')da.textContent='(same as billing)';
 var rep=data.rep;var sn=document.getElementById('signname');if(rep&&sn&&!sn.value)sn.value=rep;
+if(data.int&&/RESALE/i.test(String(data.int))){var bnr=document.getElementById('st120banner');if(bnr)bnr.style.display='block';var ss=document.getElementById('st120sec');if(ss)ss.classList.add('st120-sec-highlight');}
 }
 var idParam=p.get('id');
 if(idParam){

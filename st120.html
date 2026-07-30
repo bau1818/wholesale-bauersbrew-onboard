@@ -1,0 +1,60 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>ST-120 Resale Certificate — Bauer's Brew</title>
+<link href="https://fonts.googleapis.com/css2?family=Besley:wght@400;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#E8B63B;--gdk:#C99D28;--black:#111;--off:#F9F7F2;--border:#DDD8CC;--muted:#7A7060;--fd:'Besley',Georgia,serif;--fm:'Space Mono',monospace;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#EAE6DC;font-family:var(--fd);color:var(--black);padding:20px 12px 60px;}
+.wrap{max-width:900px;margin:0 auto;background:#fff;border:1px solid var(--border);}
+.head{background:var(--black);border-bottom:3px solid var(--gold);padding:18px 22px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;}
+.head h1{font-family:var(--fd);font-weight:900;color:var(--gold);font-size:15px;letter-spacing:.06em;text-transform:uppercase;}
+.head .biz{font-family:var(--fm);font-size:11px;color:rgba(255,255,255,.75);}
+.status{padding:12px 22px;font-family:var(--fm);font-size:11px;letter-spacing:.04em;border-bottom:1px solid var(--border);color:var(--muted);}
+.status.err{background:#fef3f2;color:#b42318;}
+.bar{padding:12px 22px;border-bottom:1px solid var(--border);display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.btn{font-family:var(--fm);font-weight:700;font-size:11px;letter-spacing:.06em;text-transform:uppercase;background:var(--gold);color:#111;text-decoration:none;padding:11px 18px;border:none;cursor:pointer;}
+.btn:hover{background:var(--gdk);}
+.viewer{padding:0;background:#525659;min-height:60vh;display:flex;align-items:center;justify-content:center;}
+.viewer iframe{width:100%;height:78vh;border:none;background:#fff;}
+.viewer img{max-width:100%;height:auto;display:block;background:#fff;}
+.foot{background:var(--black);padding:8px 22px;font-family:var(--fm);font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.7);}
+</style></head><body>
+<div class="wrap">
+<div class="head"><h1>Resale Certificate — ST-120</h1><span class="biz" id="biz"></span></div>
+<div class="status" id="status">Loading&hellip;</div>
+<div class="bar" id="bar" style="display:none;"><a class="btn" id="dl" download>Download</a><span style="font-family:var(--fm);font-size:10px;color:var(--muted);" id="fn"></span></div>
+<div class="viewer" id="viewer"></div>
+<div class="foot">Bauer's Brew Co. LLC · Internal · Confidential tax document</div>
+</div>
+<script>
+var SB_URL='https://uxmrumluonnwjxyevdjv.supabase.co';
+var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV4bXJ1bWx1b25ud2p4eWV2ZGp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzNDk2MTIsImV4cCI6MjEwMDkyNTYxMn0.JEBGLcOpNJ9a5gJuqIqx88xHlL4y_bPbBQijG_r9z9Y';
+(function(){
+var code=new URLSearchParams(location.search).get('id');
+var st=document.getElementById('status');
+if(!code){st.className='status err';st.textContent='No record code in this link.';return;}
+fetch(SB_URL+'/rest/v1/rpc/get_st120',{method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({code:code})})
+.then(function(r){return r.json();})
+.then(function(rec){
+if(!rec||!rec.file){st.className='status err';st.textContent='No ST-120 on file for this account.';return;}
+document.getElementById('biz').textContent=rec.bn||'';
+var name=rec.name||'ST-120.pdf';
+st.style.display='none';
+var bar=document.getElementById('bar');bar.style.display='flex';
+var dl=document.getElementById('dl');dl.href=rec.file;dl.setAttribute('download',name);
+document.getElementById('fn').textContent=name;
+var v=document.getElementById('viewer');
+if(rec.file.indexOf('data:application/pdf')===0){
+var f=document.createElement('iframe');f.src=rec.file;f.title='ST-120';v.appendChild(f);
+}else if(rec.file.indexOf('data:image/')===0){
+var img=document.createElement('img');img.src=rec.file;img.alt='ST-120';v.appendChild(img);
+}else{
+v.innerHTML='<p style="color:#fff;font-family:monospace;padding:30px;">Preview not available — use Download above.</p>';
+}
+})
+.catch(function(){st.className='status err';st.textContent='Could not load the certificate. Please refresh.';});
+})();
+</script>
+</body></html>

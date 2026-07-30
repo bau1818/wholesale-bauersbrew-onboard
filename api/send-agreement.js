@@ -9,6 +9,10 @@
 
 const nodemailer = require('nodemailer');
 
+const SB_URL = 'https://uxmrumluonnwjxyevdjv.supabase.co';
+const SB_KEY =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV4bXJ1bWx1b25ud2p4eWV2ZGp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzNDk2MTIsImV4cCI6MjEwMDkyNTYxMn0.JEBGLcOpNJ9a5gJuqIqx88xHlL4y_bPbBQijG_r9z9Y';
+
 function readBody(req) {
   const raw = req.body;
   if (!raw) return {};
@@ -84,6 +88,16 @@ module.exports = async (req, res) => {
       text,
       html,
     });
+    // Mark the application "approved" (best-effort — never blocks the email result)
+    if (body.code) {
+      try {
+        await fetch(SB_URL + '/rest/v1/rpc/mark_approved', {
+          method: 'POST',
+          headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ secret: process.env.ADMIN_SECRET || 'bb-admin-2026', code: String(body.code) }),
+        });
+      } catch (e) { /* status update is non-critical */ }
+    }
     return res.status(200).json({ ok: true });
   } catch (err) {
     console.error('send-agreement: failed', err && err.message ? err.message : err);

@@ -106,7 +106,8 @@ secret:'bb-admin-2026',
 to:em,
 first:((REC.rep||'').split(' ')[0])||'there',
 bn:(REC.bn||'your business').trim(),
-link:agreeURL
+link:agreeURL,
+code:idParam||''
 })})
 .then(function(r){
 if(r.ok){btn.textContent='\u2713 Agreement Sent to '+em;btn.style.background='#1c5b2a';btn.style.color='#fff';btn.style.cursor='default';return;}
