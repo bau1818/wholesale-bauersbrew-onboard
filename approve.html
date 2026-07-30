@@ -55,7 +55,7 @@ body{background:#EAE6DC;font-family:var(--fb);color:var(--black);padding:24px 12
 <div class="actions">
 <button class="btn-approve" type="button" onclick="approveAndEmail()">Approve &mdash; Email Agreement to Client</button>
 <button class="btn-copy" type="button" onclick="copyLink()">Copy Signing Link</button>
-<p class="fine">Approve opens a ready-to-send email to the applicant with their personal signing link. Review it, then hit send. Internal page &mdash; do not forward this URL.</p>
+<p class="fine">Approve instantly emails the applicant their personal signing link from sales@bauersbrew.com &mdash; no mail app needed. Internal page &mdash; do not forward this URL.</p>
 </div>
 </div>
 <footer class="foot"><span>Bauer's Brew Co. LLC &middot; Internal Use Only</span></footer>
@@ -99,11 +99,23 @@ function approveAndEmail(){
 if(!loaded){alert('Still loading this application \u2014 one moment, then tap Approve again.');return;}
 var em=(REC.em||'').trim();
 if(!em){alert('No applicant email found in this link.');return;}
-var bn=(REC.bn||'your business').trim();
-var first=((REC.rep||'').split(' ')[0])||'there';
-var subject='Approved \u2014 Your Bauer\u2019s Brew Wholesale Agreement';
-var body='Hi '+first+',\n\nGreat news \u2014 your wholesale application for '+bn+' has been approved!\n\nYour next step is to review and sign the Wholesale Agreement using your personal signing link:\n\n'+agreeURL+'\n\nReview the terms, sign, and submit \u2014 you\u2019ll see instant confirmation and can save a PDF copy for your records. We\u2019ll follow up right after with everything you need to place your first order.\n\nQuestions? Just reply to this email.\n\nMike Bauer\nBauer\u2019s Brew Co. LLC\nsales@bauersbrew.com';
-location.href='mailto:'+encodeURIComponent(em)+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+var btn=document.querySelector('.btn-approve');
+btn.disabled=true;btn.textContent='Sending\u2026';
+fetch('/api/send-agreement',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+secret:'bb-admin-2026',
+to:em,
+first:((REC.rep||'').split(' ')[0])||'there',
+bn:(REC.bn||'your business').trim(),
+link:agreeURL
+})})
+.then(function(r){
+if(r.ok){btn.textContent='\u2713 Agreement Sent to '+em;btn.style.background='#1c5b2a';btn.style.color='#fff';btn.style.cursor='default';return;}
+return r.json().catch(function(){return null;}).then(function(j){throw new Error(j&&j.error?j.error:('server responded '+r.status));});
+})
+.catch(function(err){
+btn.disabled=false;btn.textContent='Approve \u2014 Email Agreement to Client';
+alert('Could not send automatically ('+(err&&err.message?err.message:'unknown error')+').\n\nUse \u201cCopy Signing Link\u201d below and paste it into an email to '+em+' instead.');
+});
 }
 function copyLink(){
 if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(agreeURL).then(function(){alert('Signing link copied.');},function(){prompt('Copy the signing link:',agreeURL);});}

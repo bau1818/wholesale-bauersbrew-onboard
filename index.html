@@ -57,6 +57,7 @@ border-radius:0;-webkit-appearance:none;appearance:none;
 }
 textarea{resize:vertical;min-height:52px;line-height:1.5;}
 input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,182,59,.18);background:var(--white);}
+input.invalid,textarea.invalid,select.invalid{border-color:#b42318!important;box-shadow:0 0 0 3px rgba(180,35,24,.18)!important;background:#fef3f2;}
 input::placeholder,textarea::placeholder{color:#C0B9AB;}
 select{cursor:pointer;}
 /* Intention checkboxes */
@@ -236,7 +237,7 @@ body{background:#fff;padding:0;font-size:10.5px;}
 </div>
 <div class="f c6">
 <label class="lbl" for="website">Website</label>
-<input type="url" id="website" name="website" placeholder="www.yourbusiness.com">
+<input type="text" id="website" name="website" placeholder="www.yourbusiness.com" autocapitalize="off">
 </div>
 <div class="f c6">
 <label class="lbl" for="addr">Billing Address <span class="req">*</span></label>
@@ -334,6 +335,8 @@ I confirm the information above is accurate and agree to be contacted by Bauer's
 var d=new Date(),el=document.getElementById('signdate');
 if(el) el.value=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 })();
+/* ── Clear the red 'invalid' highlight as soon as the field is edited ── */
+(function(){var f=document.getElementById('wsForm');if(f)f.addEventListener('input',function(e){if(e.target&&e.target.classList)e.target.classList.remove('invalid');});})();
 /* ── Business type Other ── */
 function toggleBizOther(sel){
 var wrap=document.getElementById('biztype-other-wrap');
@@ -412,10 +415,17 @@ document.getElementById('consent').scrollIntoView({behavior:'smooth',block:'cent
 alert('Please check the confirmation box before submitting.');return;
 }
 var form=document.getElementById('wsForm');
+[].forEach.call(form.querySelectorAll('.invalid'),function(e){e.classList.remove('invalid');});
 if(!form.checkValidity()){
 var first=form.querySelector(':invalid');
-if(first){first.scrollIntoView({behavior:'smooth',block:'center'});first.focus();}
-alert('Please complete all required fields (*) before submitting.');return;
+if(first){
+first.classList.add('invalid');
+var lab=form.querySelector('label[for="'+first.id+'"]');
+var nm=lab?lab.textContent.replace(/\*/g,'').trim():'a field';
+first.scrollIntoView({behavior:'smooth',block:'center'});first.focus();
+alert(first.value&&first.value.trim()?('Please check the highlighted field — '+nm+' — it doesn’t look valid.'):('Please fill in the highlighted required field: '+nm));
+}
+return;
 }
 var intents=[...document.querySelectorAll('input[name="intent"]:checked')].map(function(e){return e.value;}).join(', ')||'\u2014';
 var prods=[...document.querySelectorAll('input[name="products"]:checked')].map(function(e){return e.value;}).join(', ')||'\u2014';
