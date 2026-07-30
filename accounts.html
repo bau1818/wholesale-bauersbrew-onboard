@@ -27,6 +27,8 @@ tr:hover td{background:#fbfaf6;}
 .pill.applied{background:#fef7e6;color:#8a6d1a;}
 .act a{font-family:var(--fm);font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;text-decoration:none;color:var(--gdk);border:1px solid var(--border);padding:5px 9px;display:inline-block;margin:2px 0;white-space:nowrap;}
 .act a:hover{border-color:var(--black);color:var(--black);}
+.act a.del{color:#b42318;border-color:#f0c9c4;}
+.act a.del:hover{border-color:#b42318;color:#b42318;}
 .foot{background:var(--black);padding:9px 24px;font-family:var(--fm);font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.7);}
 </style></head><body>
 <div class="wrap">
@@ -39,6 +41,14 @@ tr:hover td{background:#fbfaf6;}
 var SB_URL='https://uxmrumluonnwjxyevdjv.supabase.co';
 var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV4bXJ1bWx1b25ud2p4eWV2ZGp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzNDk2MTIsImV4cCI6MjEwMDkyNTYxMn0.JEBGLcOpNJ9a5gJuqIqx88xHlL4y_bPbBQijG_r9z9Y';
 var ADMIN='bb-admin-2026';
+function deleteAcct(id){
+if(!confirm('Delete this account permanently? This removes it from the whole system and cannot be undone.'))return false;
+fetch(SB_URL+'/rest/v1/rpc/delete_account',{method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({secret:ADMIN,code:id})})
+.then(function(r){return r.json();})
+.then(function(ok){if(ok===true){location.reload();}else{alert('Could not delete — try again.');}})
+.catch(function(){alert('Could not delete — check your connection.');});
+return false;
+}
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
 function fmt(iso){if(!iso)return '';var d=new Date(iso);return isNaN(d)?'':d.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});}
 fetch(SB_URL+'/rest/v1/rpc/list_accounts',{method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({secret:ADMIN})})
@@ -56,7 +66,7 @@ h+='<tr><td><div class="biz">'+esc(x.bn||'—')+'</div><div class="dim">'+esc(x.
 +'<td class="dim">'+esc(x.em||'')+'<br>'+esc(x.ph||'')+'</td>'
 +'<td class="dim">'+esc(x.bt||'')+'</td>'
 +'<td>'+status+'</td>'
-+'<td class="act">'+pdf+'</td></tr>';
++'<td class="act">'+pdf+' <a href="#" class="del" onclick="return deleteAcct(\''+encodeURIComponent(x.id)+'\')">Delete</a></td></tr>';
 });
 h+='</tbody></table></div>';
 document.getElementById('content').innerHTML=h;
