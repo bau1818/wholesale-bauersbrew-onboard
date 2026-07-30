@@ -354,9 +354,10 @@ alert('Please enter a valid email address.');return;
 }
 var btn=document.querySelector('.btn-req');
 btn.disabled=true;btn.textContent='Sending\u2026';
-/* Auto-send the wholesale line sheet PDF straight to the visitor's inbox */
-fetch('/api/send-catalog',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:em})}).catch(function(){});
-fetch('https://formspree.io/f/mjgqndpl',{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify({_subject:'Catalog Request \u2014 Wholesale','Request Type':'Wholesale Catalog Request','Email':em})})
+/* Notify the team (best-effort) that someone requested the line sheet */
+fetch('/api/notify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({subject:'Line Sheet Request \u2014 '+em,fields:{'Request Type':'Wholesale Line Sheet Request','Email':em}})}).catch(function(){});
+/* Auto-send the line sheet PDF to the visitor \u2014 this drives the success message */
+fetch('/api/send-catalog',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:em})})
 .then(function(r){
 if(r.ok){
 var fine=document.querySelector('.reqinfo-fine');
@@ -421,8 +422,10 @@ var prods=[...document.querySelectorAll('input[name="products"]:checked')].map(f
 var btn=document.querySelector('.btn-submit');
 btn.disabled=true;btn.textContent='Submitting\u2026';
 getMagic(buildData()).then(function(magic){
-return fetch('https://formspree.io/f/mjgqndpl',{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify({
-_subject:'Wholesale Application \u2014 '+fv('bizname'),
+/* Application is already saved to the database; notify the team via Gmail (best-effort) */
+fetch('/api/notify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+subject:'Wholesale Application \u2014 '+fv('bizname'),
+fields:{
 'Legal Business Name':fv('bizname'),
 'DBA':fv('dba')||'(none)',
 'Business Type':fv('biztype')+(fv('biztype-other')?' \u2014 '+fv('biztype-other'):''),
@@ -438,11 +441,9 @@ _subject:'Wholesale Application \u2014 '+fv('bizname'),
 'Account Intention':intents+(fv('intent-other-txt')?' (other: '+fv('intent-other-txt')+')':''),
 'Products of Interest':prods,
 'REVIEW & APPROVE \u2014 open this link to review the application and send the agreement':magic
-})});
-})
-.then(function(r){
-if(r.ok){window.location.href='thanks';return;}
-throw new Error();
+}
+})}).catch(function(){});
+window.location.href='thanks';
 })
 .catch(function(){
 btn.disabled=false;btn.textContent='Submit Application';

@@ -443,14 +443,14 @@ var btn=document.querySelector('.btn-submit');
 btn.disabled=true;btn.textContent='Submitting\u2026';
 var sig=canvas.toDataURL('image/png');
 var signedInfo={payopt:(pay?pay.value:''),other:fv('other-payment'),signname:fv('signname'),signtitle:fv('signtitle'),signdate:fv('signdate'),apby:pv('apBy'),apdate:pv('apDate')};
-function submitFormspree(extra){
-var base={
-_subject:'SIGNED Wholesale Agreement \u2014 '+pv('v-bn'),
+function notify(extra){
+extra=extra||{};
+var fields={
 'Legal Business Name':pv('v-bn'),
 'DBA':pv('v-dba'),
 'Business Type':pv('v-bt'),
 'Account Rep':pv('v-rep'),
-'Email':validEmail(pv('v-em')),
+'Email':pv('v-em'),
 'Phone':pv('v-ph'),
 'Invoice Email':pv('v-inv'),
 'Billing Address':pv('v-ba'),
@@ -469,8 +469,10 @@ _subject:'SIGNED Wholesale Agreement \u2014 '+pv('v-bn'),
 'Signer Title':fv('signtitle')||'(none)',
 'Signature Date':fv('signdate')
 };
-for(var k in extra){base[k]=extra[k];}
-return fetch('https://formspree.io/f/xdarqvpj',{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify(base)});
+if(extra.record)fields['Signed Agreement (view / download PDF)']=extra.record;
+var body={subject:'SIGNED Wholesale Agreement \u2014 '+pv('v-bn'),fields:fields};
+if(extra.signature)body.signature=extra.signature;
+return fetch('/api/notify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
 }
 function storeSigned(){
 var codeP=SUB_CODE?Promise.resolve(SUB_CODE):sbRpc('create_submission',{payload:RECDATA});
@@ -484,21 +486,18 @@ return 'https://wholesale.bauersbrew.com/record?id='+code;
 });
 }
 storeSigned().then(function(recordURL){
-return submitFormspree({'Signed Agreement (open to view / download PDF)':recordURL});
-},function(){
-return submitFormspree({'Drawn Signature (PNG data \u2014 paste into browser address bar to view)':sig});
-})
-.then(function(r){
+/* Signature is safely stored \u2192 agreement executed. Notify the team (best-effort). */
+notify({record:recordURL}).catch(function(){});
+showExecuted();
+}).catch(function(){
+/* Storage failed \u2014 email the signature so it is never lost; only then confirm. */
+notify({signature:sig}).then(function(r){
 if(r.ok){showExecuted();return;}
-return r.json().catch(function(){return null;}).then(function(j){
-var m='';
-if(j&&j.errors&&j.errors.length){m=j.errors.map(function(e){return e.field+' '+e.message;}).join('; ');}
-throw new Error(m||('server responded '+r.status));
-});
-})
-.catch(function(err){
+throw new Error('send failed');
+}).catch(function(){
 btn.disabled=false;btn.textContent='Sign & Submit Agreement';
-showSubmitError(err&&err.message?err.message:'unknown error');
+showSubmitError('We could not save your signature. Nothing was submitted \u2014 please email a copy to sales@bauersbrew.com.');
+});
 });
 }
 function validEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v||'').trim())?String(v).trim():undefined;}
